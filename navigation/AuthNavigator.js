@@ -1,6 +1,7 @@
+// navigation/AuthNavigator.js
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth, AuthProvider } from "../core/auth/AuthContext";
-import { View, ActivityIndicator, Text } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import LoginScreen from "../app/LoginScreen";
 import SignupScreen from "../app/SignupScreen";
 import EmployerDashboard from "../app/EmployerDashboard";
@@ -13,7 +14,6 @@ function AppContent() {
 
   console.log("🔄 AuthNavigator - User:", user);
   console.log("🔄 AuthNavigator - User Role:", user?.role);
-  console.log("🔄 AuthNavigator - Loading:", loading);
 
   if (loading) {
     return (
@@ -29,6 +29,10 @@ function AppContent() {
     );
   }
 
+  // ✅ FIX: Check for BOTH "employer" AND "admin"
+  const showEmployerDashboard =
+    user?.role === "employer" || user?.role === "admin";
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!user ? (
@@ -36,7 +40,7 @@ function AppContent() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
         </>
-      ) : user.role === "employer" ? (
+      ) : showEmployerDashboard ? (
         <Stack.Screen name="EmployerDashboard" component={EmployerDashboard} />
       ) : (
         <Stack.Screen name="UserDashboard" component={UserDashboard} />
@@ -46,7 +50,6 @@ function AppContent() {
 }
 
 export default function AuthNavigator() {
-  console.log("📱 AuthNavigator - Rendering");
   return (
     <AuthProvider>
       <AppContent />

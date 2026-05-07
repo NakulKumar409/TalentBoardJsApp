@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../core/auth/AuthContext";
 
 export default function LoginScreen({ navigation }) {
@@ -17,9 +17,17 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, user } = useAuth();
+
+  // ✅ DEBUG: Check if user state changes
+  useEffect(() => {
+    console.log("🔍 [LoginScreen] User state changed:", user);
+    console.log("🔍 [LoginScreen] User role:", user?.role);
+  }, [user]);
 
   const handleLogin = async () => {
+    console.log("🔍 [LoginScreen] Login started with email:", email);
+
     if (!email || !password) {
       Alert.alert("Error", "Please fill all fields");
       return;
@@ -27,19 +35,32 @@ export default function LoginScreen({ navigation }) {
 
     try {
       setLoading(true);
+      console.log("🔍 [LoginScreen] Calling login function...");
+
       const result = await login(email, password);
 
-      console.log("Login result:", result);
+      console.log(
+        "🔍 [LoginScreen] Login result FULL:",
+        JSON.stringify(result, null, 2)
+      );
+      console.log("🔍 [LoginScreen] Result success:", result.success);
+      console.log("🔍 [LoginScreen] Result role:", result.role);
 
       if (!result.success) {
         Alert.alert("Login Failed", result.error);
+      } else {
+        console.log(
+          "✅ [LoginScreen] Login successful! Role received:",
+          result.role
+        );
+        // ✅ AuthNavigator will auto handle redirect
       }
-      // ✅ NO MANUAL NAVIGATION - AuthNavigator will auto handle
     } catch (error) {
+      console.log("❌ [LoginScreen] Login error:", error);
       Alert.alert("Error", "Something went wrong");
-      console.log(error);
     } finally {
       setLoading(false);
+      console.log("🔍 [LoginScreen] Login finished");
     }
   };
 

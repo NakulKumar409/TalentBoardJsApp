@@ -34,11 +34,14 @@ export default function SignupScreen({ navigation }) {
 
     try {
       setLoading(true);
+
+      // ✅ SIRF USER ROLE - KOI DROPDOWN NAHI
       const result = await signup({
-        name,
-        email,
-        password,
-        confirmPassword,
+        name: name,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        role: "user", // ✅ FIXED: Always "user"
       });
 
       console.log("Signup result:", result);
@@ -46,7 +49,6 @@ export default function SignupScreen({ navigation }) {
       if (!result.success) {
         Alert.alert("Signup Failed", result.error);
       }
-      // ✅ NO MANUAL NAVIGATION - AuthNavigator will auto handle
     } catch (error) {
       Alert.alert("Error", "Something went wrong");
       console.log(error);
@@ -69,7 +71,7 @@ export default function SignupScreen({ navigation }) {
         </View>
 
         <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join DeepSeek AI today</Text>
+        <Text style={styles.subtitle}>Join TalentBoard today</Text>
       </View>
 
       <View style={styles.card}>
@@ -87,7 +89,7 @@ export default function SignupScreen({ navigation }) {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>Email Address</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter your email"
@@ -123,6 +125,14 @@ export default function SignupScreen({ navigation }) {
           />
         </View>
 
+        <View style={styles.termsContainer}>
+          <Text style={styles.termsText}>
+            By signing up, you agree to our{" "}
+            <Text style={styles.termsLink}>Terms</Text> and{" "}
+            <Text style={styles.termsLink}>Privacy Policy</Text>
+          </Text>
+        </View>
+
         <TouchableOpacity
           style={styles.signupButton}
           onPress={handleSignup}
@@ -130,7 +140,7 @@ export default function SignupScreen({ navigation }) {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.signupButtonText}>Create Account</Text>
+            <Text style={styles.signupButtonText}>Sign Up</Text>
           )}
         </TouchableOpacity>
 
@@ -214,12 +224,23 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
   },
+  termsContainer: {
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  termsText: {
+    color: "#888",
+    fontSize: 12,
+    textAlign: "center",
+  },
+  termsLink: {
+    color: "#00B4D8",
+  },
   signupButton: {
     backgroundColor: "#00B4D8",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
-    marginTop: 8,
     marginBottom: 20,
   },
   signupButtonText: {

@@ -56,36 +56,65 @@ export const AuthProvider = ({ children }) => {
         false
       );
 
-      console.log("LOGIN RESULT:", result);
+      console.log("LOGIN RESULT:", JSON.stringify(result, null, 2));
 
       if (result.success) {
-        const { token, user } = result.data;
+        let token = null;
+        let userData = null;
 
-        console.log("✅ Saving user:", user);
-        console.log("✅ Saving token:", token);
+        // Handle different response structures
+        if (result.data) {
+          token = result.data.token;
+          userData = result.data.user;
 
-        // ✅ SAVE TOKEN
+          // If user object is not present, create from role
+          if (!userData && result.data.role) {
+            userData = {
+              email: email,
+              role: result.data.role,
+            };
+          }
+        }
+
+        // Direct response structure
+        if (!token && result.token) {
+          token = result.token;
+          userData = result.user;
+        }
+
+        console.log("✅ Extracted token:", token);
+        console.log("✅ Extracted user:", userData);
+        console.log("✅ User role:", userData?.role);
+
+        if (!token || !userData) {
+          console.error("❌ Could not extract user data");
+          return {
+            success: false,
+            error: "Invalid server response",
+          };
+        }
+
+        // SAVE TOKEN
         await AsyncStorage.setItem("token", token);
 
-        // ✅ SAVE USER
-        await AsyncStorage.setItem("user", JSON.stringify(user));
+        // SAVE USER
+        await AsyncStorage.setItem("user", JSON.stringify(userData));
 
-        // ✅ UPDATE CONTEXT - Force state update
-        setUser({ ...user }); // Create new object to force re-render
+        // UPDATE CONTEXT
+        setUser({ ...userData });
 
         return {
           success: true,
-          role: user?.role || "user",
+          role: userData?.role || "user",
         };
       }
 
       return {
         success: false,
-        error: result.error,
+        error: result.error || "Login failed",
       };
     } catch (error) {
       console.log("LOGIN ERROR:", error);
-
       return {
         success: false,
         error: "Something went wrong",
@@ -96,10 +125,21 @@ export const AuthProvider = ({ children }) => {
   // ✅ SIGNUP
   const signup = async (userData) => {
     try {
-      // STEP 1 REGISTER
+      // Prepare payload for backend
+      const payload = {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        confirmPassword: userData.confirmPassword,
+        role: userData.role || "user",
+      };
+
+      console.log("📤 SIGNUP PAYLOAD:", payload);
+
+      // STEP 1: REGISTER
       const registerResult = await apiClient.post(
         "/auth/register",
-        userData,
+        payload,
         false
       );
 
@@ -108,11 +148,11 @@ export const AuthProvider = ({ children }) => {
       if (!registerResult.success) {
         return {
           success: false,
-          error: registerResult.error,
+          error: registerResult.error || "Registration failed",
         };
       }
 
-      // STEP 2 AUTO LOGIN
+      // STEP 2: AUTO LOGIN
       const loginResult = await apiClient.post(
         "/auth/login",
         {
@@ -122,22 +162,51 @@ export const AuthProvider = ({ children }) => {
         false
       );
 
-      console.log("AUTO LOGIN RESULT:", loginResult);
+      console.log("AUTO LOGIN RESULT:", JSON.stringify(loginResult, null, 2));
 
       if (loginResult.success) {
-        const { token, user } = loginResult.data;
+        let token = null;
+        let user = null;
 
-        console.log("✅ Saving user after signup:", user);
-        console.log("✅ Saving token after signup:", token);
+        // Extract token and user from response
+        if (loginResult.data) {
+          token = loginResult.data.token;
+          user = loginResult.data.user;
+
+          if (!user && loginResult.data.role) {
+            user = {
+              email: userData.email,
+              name: userData.name,
+              role: loginResult.data.role,
+            };
+          }
+        }
+
+        if (!token && loginResult.token) {
+          token = loginResult.token;
+          user = loginResult.user;
+        }
+
+        console.log("✅ User after signup:", user);
+        console.log("✅ User role after signup:", user?.role);
+
+        if (!user) {
+          return {
+            success: false,
+            error: "Invalid server response",
+          };
+        }
 
         // SAVE TOKEN
-        await AsyncStorage.setItem("token", token);
+        if (token) {
+          await AsyncStorage.setItem("token", token);
+        }
 
         // SAVE USER
         await AsyncStorage.setItem("user", JSON.stringify(user));
 
-        // UPDATE CONTEXT - Force state update
-        setUser({ ...user }); // Create new object to force re-render
+        // UPDATE CONTEXT
+        setUser({ ...user });
 
         return {
           success: true,
@@ -147,11 +216,10 @@ export const AuthProvider = ({ children }) => {
 
       return {
         success: false,
-        error: loginResult.error,
+        error: loginResult.error || "Auto login failed",
       };
     } catch (error) {
       console.log("SIGNUP ERROR:", error);
-
       return {
         success: false,
         error: "Something went wrong",
@@ -161,9 +229,58 @@ export const AuthProvider = ({ children }) => {
 
   // ✅ LOGOUT
   const logout = async () => {
-    await AsyncStorage.removeItem("token");
-    await AsyncStorage.removeItem("user");
-    setUser(null);
+    try {
+      // Clear storage
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("user");
+
+      // Clear state
+      setUser(null);
+
+      console.log("✅ Logged out successfully");
+    } catch (error) {
+      console.log("LOGOUT ERROR:", error);
+    }
+  };
+
+  // ✅ UPDATE USER (for profile updates)
+  const updateUser = async (updatedData) => {
+    try {
+      const currentUser = user;
+      const newUser = { ...currentUser, ...updatedData };
+
+      await AsyncStorage.setItem("user", JSON.stringify(newUser));
+      setUser(newUser);
+
+      console.log("✅ User updated:", newUser);
+
+      return {
+        success: true,
+        user: newUser,
+      };
+    } catch (error) {
+      console.log("UPDATE USER ERROR:", error);
+      return {
+        success: false,
+        error: "Failed to update user",
+      };
+    }
+  };
+
+  // ✅ GET TOKEN
+  const getToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      return token;
+    } catch (error) {
+      console.log("GET TOKEN ERROR:", error);
+      return null;
+    }
+  };
+
+  // ✅ IS AUTHENTICATED
+  const isAuthenticated = () => {
+    return user !== null;
   };
 
   return (
@@ -174,6 +291,9 @@ export const AuthProvider = ({ children }) => {
         login,
         signup,
         logout,
+        updateUser,
+        getToken,
+        isAuthenticated,
       }}>
       {children}
     </AuthContext.Provider>
