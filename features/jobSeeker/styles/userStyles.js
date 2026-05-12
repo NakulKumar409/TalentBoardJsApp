@@ -1,0 +1,507 @@
+// features/jobSeeker/styles/userStyles.js
+import { Dimensions, Platform, StyleSheet } from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export const styles = StyleSheet.create({
+  // ========== CONTAINERS & LAYOUT ==========
+  container: { flex: 1, backgroundColor: "#0B0D1A" },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#0B0D1A",
+  },
+
+  // ========== HEADER ==========
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === "ios" ? 60 : 40,
+    paddingBottom: 20,
+  },
+  welcomeText: { fontSize: 14, color: "#888" },
+  userName: { fontSize: 24, fontWeight: "bold", color: "#fff", marginTop: 4 },
+  userEmail: { fontSize: 13, color: "#666", marginTop: 2 },
+
+  // ========== STATS GRID ==========
+  statsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 16,
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+    alignItems: "center",
+  },
+  statNumber: { fontSize: 28, fontWeight: "bold" },
+  statLabel: { fontSize: 12, color: "#888", marginTop: 4 },
+
+  // ========== BOTTOM NAVIGATION ==========
+  bottomNav: {
+    flexDirection: "row",
+    backgroundColor: "#0F1225",
+    borderTopWidth: 1,
+    borderTopColor: "#1E2240",
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    marginBottom: 16,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  navItemActive: { backgroundColor: "#7C3AED20" },
+  navText: { fontSize: 14, color: "#888", fontWeight: "500" },
+  navTextActive: { color: "#7C3AED", fontWeight: "bold" },
+
+  // ========== SEARCH ==========
+  searchContainer: {
+    backgroundColor: "#131629",
+    marginHorizontal: 16,
+    marginBottom: 16,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  searchInput: { paddingVertical: 12, color: "#fff", fontSize: 14 },
+
+  // ========== JOB CARD ==========
+  jobCard: {
+    backgroundColor: "#131629",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+    gap: 8,
+  },
+  jobTitle: { fontSize: 16, fontWeight: "bold", color: "#fff" },
+  jobCompany: { fontSize: 13, color: "#888", marginTop: 2 },
+  tagsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
+  tag: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  tagText: { fontSize: 11, color: "#AAA" },
+  skillsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
+  skillTag: {
+    backgroundColor: "#7C3AED20",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  skillText: { fontSize: 11, color: "#9B8EFF" },
+  buttonRow: { flexDirection: "row", gap: 12, marginTop: 12 },
+  detailsBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#7C3AED",
+    alignItems: "center",
+  },
+  detailsBtnText: { color: "#7C3AED", fontWeight: "600" },
+  applyBtn: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  applyBtnText: { color: "#fff", fontWeight: "600" },
+
+  // ========== APPLICATION CARD ==========
+  appCard: {
+    backgroundColor: "#131629",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  appJobTitle: { fontSize: 16, fontWeight: "bold", color: "#fff" },
+  appCompany: { fontSize: 13, color: "#888", marginTop: 2 },
+  appDate: { fontSize: 12, color: "#666", marginTop: 4 },
+  appStatusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  statusText: { fontSize: 11, fontWeight: "bold" },
+  appScore: { fontSize: 12, color: "#7C3AED", fontWeight: "600" },
+
+  // ========== EMPTY STATE ==========
+  emptyState: { alignItems: "center", paddingVertical: 60 },
+  emptyTitle: { fontSize: 16, color: "#888" },
+  emptyText: { fontSize: 14, color: "#666", marginTop: 8 },
+
+  // ========== PROFILE SECTION ==========
+  profileTop: {
+    alignItems: "center",
+    paddingTop: 20,
+    paddingBottom: 24,
+    gap: 8,
+  },
+  profileAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#1A1D35",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#2A2E50",
+  },
+  profileAvatarText: { fontSize: 32, fontWeight: "bold", color: "#9B8EFF" },
+  profileName: { fontSize: 20, fontWeight: "bold", color: "#fff" },
+  profileEmail: { fontSize: 14, color: "#888" },
+  profileBadge: {
+    paddingHorizontal: 18,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  profileBadgeText: { fontSize: 14, color: "#9B8EFF" },
+  profileSection: { paddingHorizontal: 16, marginTop: 8, marginBottom: 30 },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 16,
+  },
+  menuItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#131629",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  menuTitle: { fontSize: 15, fontWeight: "600", color: "#fff" },
+  menuDesc: { fontSize: 12, color: "#888", marginTop: 2 },
+  arrow: { fontSize: 18, color: "#666" },
+  logoutButton: {
+    backgroundColor: "#EF4444",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  logoutButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+
+  // ========== MODAL STYLES ==========
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#131629",
+    borderRadius: 24,
+    width: width * 0.95,
+    maxHeight: height * 0.9,
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  modalTitle: { fontSize: 20, fontWeight: "bold", color: "#fff" },
+  modalClose: { fontSize: 24, color: "#888", fontWeight: "bold" },
+  modalFooter: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#1E2240",
+  },
+  modalApplyBtn: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  modalApplyBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  modalJobTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 4,
+  },
+  modalJobCompany: { fontSize: 15, color: "#888", marginBottom: 16 },
+
+  // ========== FORM INPUT STYLES ==========
+  inputGroup: { marginBottom: 16 },
+  label: { fontSize: 14, fontWeight: "600", color: "#DDD", marginBottom: 8 },
+  required: { color: "#EF4444" },
+  input: {
+    backgroundColor: "#1E2240",
+    borderRadius: 12,
+    padding: 14,
+    color: "#fff",
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  inputError: { borderColor: "#EF4444", borderWidth: 1 },
+  errorText: { fontSize: 12, color: "#EF4444", marginTop: 4 },
+  datePickerButton: {
+    backgroundColor: "#1E2240",
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  dateText: { color: "#fff", fontSize: 14 },
+  placeholderText: { color: "#666", fontSize: 14 },
+  pickerContainer: {
+    backgroundColor: "#1E2240",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+    overflow: "hidden",
+  },
+  picker: { color: "#fff", height: 50 },
+  textArea: { height: 100, textAlignVertical: "top" },
+
+  // ========== STEP FORM STYLES ==========
+  stepTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#7C3AED",
+    marginBottom: 20,
+    marginTop: 8,
+  },
+  subStepTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#9B8EFF",
+    marginTop: 16,
+    marginBottom: 12,
+  },
+
+  // ========== BUTTON STYLES ==========
+  prevBtn: {
+    flex: 1,
+    backgroundColor: "#1E2240",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  prevBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  nextBtn: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  nextBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  submitBtn: {
+    flex: 1,
+    backgroundColor: "#10B981",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  submitBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  disabledBtn: {
+    opacity: 0.5,
+  },
+
+  // ========== DETAIL BOX STYLES ==========
+  detailBox: {
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  detailLabel: {
+    fontSize: 12,
+    color: "#7C3AED",
+    marginBottom: 4,
+    fontWeight: "600",
+  },
+  detailText: { fontSize: 14, color: "#DDD" },
+  appDetailName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  appDetailEmail: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+
+  // ========== PROGRESS INDICATOR ==========
+  progressContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 20,
+    paddingVertical: 10,
+  },
+  progressDot: {
+    width: 30,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#1E2240",
+  },
+  progressDotActive: {
+    backgroundColor: "#7C3AED",
+    width: 40,
+  },
+  progressDotCompleted: {
+    backgroundColor: "#10B981",
+  },
+
+  // ========== CONFIRM LOGOUT MODAL ==========
+  confirmModal: {
+    backgroundColor: "#131629",
+    borderRadius: 20,
+    padding: 24,
+    width: width - 60,
+    alignSelf: "center",
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  confirmTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  confirmText: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  confirmButtons: { flexDirection: "row", gap: 12 },
+  confirmBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  cancelConfirmBtn: { backgroundColor: "#1E2240" },
+  logoutConfirmBtn: { backgroundColor: "#EF4444" },
+  cancelConfirmText: { color: "#888", fontWeight: "600" },
+  logoutConfirmText: { color: "#fff", fontWeight: "600" },
+
+  // ========== CHECKBOX STYLES (STEP 5) ==========
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 16,
+    paddingVertical: 8,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#7C3AED",
+    backgroundColor: "#1E2240",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: "#7C3AED",
+    borderColor: "#7C3AED",
+  },
+  checkboxTick: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    color: "#DDD",
+    flex: 1,
+    flexWrap: "wrap",
+  },
+
+  // ========== STEP 5 ADDITIONAL STYLES ==========
+  checkboxWrapper: {
+    marginBottom: 20,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  checkboxInner: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  checkboxText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#DDD",
+    lineHeight: 20,
+  },
+  linkText: {
+    color: "#7C3AED",
+    fontWeight: "600",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#1E2240",
+    marginVertical: 20,
+  },
+  warningBox: {
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "rgba(239, 68, 68, 0.3)",
+  },
+  warningText: {
+    fontSize: 12,
+    color: "#F59E0B",
+    textAlign: "center",
+  },
+});
