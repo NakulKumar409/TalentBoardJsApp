@@ -1,4 +1,3 @@
-// core/api/apiClient.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BASE_URL = "http://192.168.31.114:3004/api";
@@ -8,9 +7,19 @@ const apiClient = {
     return await AsyncStorage.getItem("token");
   },
 
-  request: async (method, endpoint, data = null, requiresAuth = true) => {
+  request: async (
+    method,
+    endpoint,
+    data = null,
+    requiresAuth = true,
+    isFormData = false
+  ) => {
     const url = `${BASE_URL}${endpoint}`;
-    const headers = { "Content-Type": "application/json" };
+    const headers = {};
+
+    if (!isFormData) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (requiresAuth) {
       const token = await apiClient.getToken();
@@ -19,8 +28,16 @@ const apiClient = {
       }
     }
 
-    const config = { method, headers };
-    if (data) config.body = JSON.stringify(data);
+    let body = null;
+    if (data) {
+      if (isFormData) {
+        body = data;
+      } else {
+        body = JSON.stringify(data);
+      }
+    }
+
+    const config = { method, headers, body };
 
     try {
       const response = await fetch(url, config);
@@ -30,23 +47,28 @@ const apiClient = {
         return {
           success: false,
           error: responseData.message || "Request failed",
+          ...responseData,
         };
       }
 
       return { success: true, data: responseData };
     } catch (error) {
+      console.error("API Error:", error);
       return { success: false, error: "Network error" };
     }
   },
 
   get: (endpoint, requiresAuth = true) =>
-    apiClient.request("GET", endpoint, null, requiresAuth),
-  post: (endpoint, data, requiresAuth = true) =>
-    apiClient.request("POST", endpoint, data, requiresAuth),
-  put: (endpoint, data, requiresAuth = true) =>
-    apiClient.request("PUT", endpoint, data, requiresAuth),
+    apiClient.request("GET", endpoint, null, requiresAuth, false),
+
+  post: (endpoint, data, requiresAuth = true, isFormData = false) =>
+    apiClient.request("POST", endpoint, data, requiresAuth, isFormData),
+
+  put: (endpoint, data, requiresAuth = true, isFormData = false) =>
+    apiClient.request("PUT", endpoint, data, requiresAuth, isFormData),
+
   delete: (endpoint, requiresAuth = true) =>
-    apiClient.request("DELETE", endpoint, null, requiresAuth),
+    apiClient.request("DELETE", endpoint, null, requiresAuth, false),
 };
 
 export default apiClient;
