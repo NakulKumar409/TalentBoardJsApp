@@ -3,9 +3,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, View } from "react-native";
 import LoginScreen from "../app/LoginScreen";
 import SignupScreen from "../app/SignupScreen";
-import UserDashboard from "../app/UserDashboard";
 import { AuthProvider, useAuth } from "../core/auth/AuthContext";
 import EmployerDashboard from "../features/employerJobs/screens/EmployerDashboard";
+import UserDashboard from "../features/jobSeeker/screens/UserDashboard";
 
 const Stack = createNativeStackNavigator();
 
