@@ -60,6 +60,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // core/auth/AuthContext.js - SIRF login FUNCTION REPLACE KARO
+
   const login = async (email, password) => {
     try {
       const result = await apiClient.post(
@@ -70,26 +72,51 @@ export const AuthProvider = ({ children }) => {
 
       console.log("📦 Login Response:", JSON.stringify(result, null, 2));
 
-      let token = result?.token || result?.data?.token;
-      let userData = result?.user || result?.data?.user;
+      // ✅ FIX: Token and role are inside data object
+      let token = null;
+      let role = "user";
+      let userEmail = email;
+      let userName = email.split("@")[0];
 
-      if (!token || !userData) {
+      // Check if token is inside data object
+      if (result?.data?.token) {
+        token = result.data.token;
+        role = result.data.role || "user";
+        // If user data is also inside data.user
+        if (result.data.user) {
+          userEmail = result.data.user.email || email;
+          userName = result.data.user.name || userName;
+        }
+      }
+      // Fallback: direct in result
+      else if (result?.token) {
+        token = result.token;
+        role = result.role || "user";
+        if (result.user) {
+          userEmail = result.user.email || email;
+          userName = result.user.name || userName;
+        }
+      }
+
+      if (!token) {
+        console.error("❌ No token found");
         return { success: false, error: "Invalid response from server" };
       }
 
-      // ✅ Get role from backend
-      const role = userData.role || "user";
-      const userId = userData._id || userData.id || generateObjectId();
+      console.log("🎯 Extracted role:", role);
+      console.log("🎯 Token:", token.substring(0, 50) + "...");
+
+      const userId = generateObjectId();
 
       const userWithId = {
         _id: userId,
         id: userId,
-        name: userData.name,
-        email: userData.email,
-        role: role,
+        name: userName,
+        email: userEmail,
+        role: role, // "admin" ya "user"
       };
 
-      console.log("✅ Storing user with role:", role);
+      console.log("✅ Storing user:", userWithId);
 
       await AsyncStorage.setItem("token", token);
       await AsyncStorage.setItem("user", JSON.stringify(userWithId));
