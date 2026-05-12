@@ -1,395 +1,860 @@
-// UserDashboard.js - Complete fixed version
-
-import React, { useEffect, useState } from "react";
+// app/UserDashboard.js - COMPLETE FIXED CODE WITH DATE VALIDATION
+import { CommonActions } from "@react-navigation/native";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  Modal,
-  StyleSheet,
   ActivityIndicator,
   Alert,
+  Dimensions,
+  Modal,
+  Platform,
   RefreshControl,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useAuth } from "../core/auth/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import apiClient from "../core/api/apiClient";
+import { useAuth } from "../core/auth/AuthContext";
 
-// Icons (same as EmployerDashboard)
-const Icon = {
-  Briefcase: () => <Text style={{ fontSize: 20 }}>💼</Text>,
-  Users: () => <Text style={{ fontSize: 20 }}>👥</Text>,
-  User: () => <Text style={{ fontSize: 20 }}>👤</Text>,
-  Search: () => <Text style={{ fontSize: 16 }}>🔍</Text>,
-  Clock: () => <Text style={{ fontSize: 14 }}>⏰</Text>,
-  FileText: () => <Text style={{ fontSize: 16 }}>📄</Text>,
-  MapPin: () => <Text style={{ fontSize: 12 }}>📍</Text>,
-  DollarSign: () => <Text style={{ fontSize: 12 }}>$</Text>,
-  Calendar: () => <Text style={{ fontSize: 14 }}>📅</Text>,
-  LogOut: () => <Text style={{ fontSize: 20 }}>🚪</Text>,
-  Building: () => <Text style={{ fontSize: 20 }}>🏢</Text>,
-  ChevronRight: () => <Text style={{ fontSize: 16 }}>›</Text>,
-  Bell: () => <Text style={{ fontSize: 20 }}>🔔</Text>,
-  CreditCard: () => <Text style={{ fontSize: 20 }}>💳</Text>,
-  HelpCircle: () => <Text style={{ fontSize: 20 }}>❓</Text>,
-};
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0B0D1A" },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#0B0D1A",
-  },
-  header: { paddingTop: 60, paddingHorizontal: 20, paddingBottom: 20 },
-  welcomeText: { fontSize: 14, color: "#888", marginBottom: 4 },
-  userName: { fontSize: 26, fontWeight: "700", color: "#fff" },
-  searchWrap: { marginHorizontal: 20, marginBottom: 16 },
-  searchInput: {
-    backgroundColor: "#131629",
-    borderWidth: 1,
-    borderColor: "#1E2240",
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 44,
-    color: "#fff",
-    fontSize: 15,
-  },
-  searchIcon: { position: "absolute", left: 14, top: "50%", zIndex: 1 },
-  jobCard: {
-    backgroundColor: "#131629",
-    borderRadius: 18,
-    padding: 18,
-    marginHorizontal: 16,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: "#1E2240",
-  },
-  jobTitle: { fontSize: 18, fontWeight: "700", color: "#fff" },
-  jobCompany: { fontSize: 14, color: "#888", marginTop: 2 },
-  jobMeta: { flexDirection: "row", gap: 16, marginTop: 10 },
-  metaText: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    fontSize: 13,
-    color: "#888",
-  },
-  badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 10 },
-  badge: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 24,
-    fontSize: 12,
-    fontWeight: "600",
-    borderWidth: 1,
-    borderColor: "#2A2E50",
-    color: "#CCD",
-  },
-  skillsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 },
-  skillBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 14,
-    backgroundColor: "#7C3AED15",
-    color: "#9B8EFF",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  sectionTitle: { fontSize: 18, fontWeight: "600", color: "#fff" },
-  seeAll: { fontSize: 14, color: "#7C3AED", fontWeight: "500" },
-  emptyText: { textAlign: "center", color: "#666", paddingTop: 60 },
-  profileTop: {
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingBottom: 28,
-    alignItems: "center",
-  },
-  profileAvatar: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    backgroundColor: "#1A1D35",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "#2A2E50",
-    marginBottom: 10,
-  },
-  profileAvatarText: { fontSize: 36, fontWeight: "700", color: "#9B8EFF" },
-  profileName: { fontSize: 22, fontWeight: "700", color: "#fff" },
-  profileEmail: { fontSize: 15, color: "#888" },
-  profileBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#2A2E50",
-    marginTop: 8,
-  },
-  profileBadgeText: { fontSize: 15, color: "#9B8EFF" },
-  profileSection: { paddingHorizontal: 20 },
-  profileSectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#fff",
-    marginBottom: 16,
-  },
-  profileItem: {
-    backgroundColor: "#131629",
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    borderWidth: 1,
-    borderColor: "#1E2240",
-  },
-  profileItemIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: "#1A1D35",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  profileItemText: { flex: 1 },
-  profileItemTitle: { fontSize: 16, fontWeight: "600", color: "#fff" },
-  profileItemDesc: { fontSize: 13, color: "#888", marginTop: 4 },
-  logoutItem: { borderColor: "#FF444430" },
-  logoutText: { color: "#FF4444" },
-  nav: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    backgroundColor: "#0F1225",
-    borderTopWidth: 1,
-    borderTopColor: "#1E2240",
-  },
-  navItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    gap: 6,
-  },
-  navText: { fontSize: 12, fontWeight: "500", color: "#666" },
-  navTextActive: { color: "#7C3AED" },
-  appCard: {
-    backgroundColor: "#131629",
-    borderRadius: 18,
-    padding: 18,
-    marginHorizontal: 16,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: "#1E2240",
-  },
-  appCardRow: { flexDirection: "row", alignItems: "center", gap: 14 },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: "#1E1E3A",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: { fontSize: 22, color: "#7C3AED", fontWeight: "700" },
-  appName: { fontSize: 16, fontWeight: "700", color: "#fff" },
-  appRole: { fontSize: 14, color: "#888", marginTop: 2 },
-  statusPill: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 24 },
-  statusText: { fontSize: 13, fontWeight: "600" },
-  dateRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginTop: 12,
-  },
-  dateText: { fontSize: 13, color: "#888" },
-  paginationContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 12,
-    padding: 20,
-    marginBottom: 20,
-  },
-  pageBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#1E2240",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pageBtnActive: { backgroundColor: "#7C3AED" },
-  pageBtnDisabled: { opacity: 0.5 },
-  pageBtnText: { color: "#fff", fontSize: 14, fontWeight: "600" },
-  pageInfo: { fontSize: 14, color: "#AAA" },
-});
-
-const statusColor = (s) => {
-  const status = (s || "Applied").toLowerCase();
-  const colors = {
-    applied: "#F59E0B",
-    pending: "#F59E0B",
-    reviewed: "#3B82F6",
-    shortlisted: "#10B981",
-    rejected: "#EF4444",
-    hired: "#8B5CF6",
-  };
-  return colors[status] || "#888";
-};
-
-const statusLabel = (s) =>
-  (s || "Applied").charAt(0).toUpperCase() + (s || "Applied").slice(1);
+const { width, height } = Dimensions.get("window");
 
 export default function UserDashboard({ navigation }) {
-  const [tab, setTab] = useState("jobs");
+  const { user, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState("jobs");
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [jobsPage, setJobsPage] = useState(1);
-  const [jobsTotalPages, setJobsTotalPages] = useState(1);
-  const [appsPage, setAppsPage] = useState(1);
-  const [appsTotalPages, setAppsTotalPages] = useState(1);
-  const { user, logout } = useAuth();
+  const [jobSearch, setJobSearch] = useState("");
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [jobDetailsModal, setJobDetailsModal] = useState(false);
+  const [applyModal, setApplyModal] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [viewAppModal, setViewAppModal] = useState(false);
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
-  // SAFE data accessors - THIS IS THE KEY FIX
-  const safeJobs = Array.isArray(jobs) ? jobs : [];
-  const safeApplications = Array.isArray(applications) ? applications : [];
+  const [applicationForm, setApplicationForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    dob: "",
+    gender: "",
+    address: "",
+    city: "",
+    state: "",
+    country: "",
+    pincode: "",
+    aadhaar: "",
+    pan: "",
+    uan: "",
+    tenthBoard: "",
+    tenthPercentage: "",
+    tenthYear: "",
+    twelfthBoard: "",
+    twelfthPercentage: "",
+    twelfthYear: "",
+    graduationCollege: "",
+    graduationDegree: "",
+    graduationPercentage: "",
+    graduationYear: "",
+    postGraduationCollege: "",
+    postGraduationDegree: "",
+    postGraduationPercentage: "",
+    postGraduationYear: "",
+    experienceYears: "",
+    companyName: "",
+    companyRole: "",
+    startDate: "",
+    endDate: "",
+    previousCompany: "",
+    previousRole: "",
+    skills: "",
+    topSkills: "",
+    github: "",
+    linkedin: "",
+    portfolio: "",
+    coverLetter: "",
+    acceptTerms: false,
+    confirmInformation: false,
+  });
 
-  const loadJobs = async (page = 1) => {
+  const loadJobs = async () => {
     try {
-      const result = await apiClient.get(`/jobs?page=${page}&limit=10`, false);
+      const result = await apiClient.get("/jobs", false);
       if (result.success) {
-        // FIX: Handle both array and object responses (same as EmployerDashboard)
         let jobsData = [];
         if (Array.isArray(result.data)) {
           jobsData = result.data;
-        } else if (result.data && Array.isArray(result.data.data)) {
+        } else if (result.data?.data && Array.isArray(result.data.data)) {
           jobsData = result.data.data;
-        } else if (result.data && typeof result.data === "object") {
-          jobsData = Object.values(result.data).filter(
-            (item) => item && typeof item === "object" && item._id
-          );
         } else {
           jobsData = [];
         }
         setJobs(jobsData);
-        setJobsTotalPages(result.pages || 1);
-        setJobsPage(page);
       } else {
         setJobs([]);
-        console.error("Failed to load jobs:", result.error);
       }
     } catch (error) {
-      console.error("Error loading jobs:", error);
+      console.error("Error:", error);
       setJobs([]);
     }
   };
 
-  const loadApplications = async (page = 1) => {
+  const loadApplications = async () => {
     try {
-      const result = await apiClient.get(
-        `/applications/my-applications?page=${page}&limit=10`,
-        true
-      );
+      const result = await apiClient.get("/applications/my", true);
       if (result.success) {
         let appsData = [];
         if (Array.isArray(result.data)) {
           appsData = result.data;
-        } else if (result.data && Array.isArray(result.data.applications)) {
+        } else if (
+          result.data?.applications &&
+          Array.isArray(result.data.applications)
+        ) {
           appsData = result.data.applications;
-        } else if (result.data && Array.isArray(result.data.data)) {
+        } else if (result.data?.data && Array.isArray(result.data.data)) {
           appsData = result.data.data;
-        } else if (result.data && typeof result.data === "object") {
-          appsData = Object.values(result.data).filter(
-            (item) => item && typeof item === "object" && item._id
-          );
         } else {
           appsData = [];
         }
         setApplications(appsData);
-        setAppsTotalPages(result.pages || 1);
-        setAppsPage(page);
       } else {
         setApplications([]);
-        console.error("Failed to load applications:", result.error);
       }
     } catch (error) {
-      console.error("Error loading applications:", error);
+      console.error("Error:", error);
       setApplications([]);
     }
   };
 
   const loadAll = async () => {
     setLoading(true);
-    await Promise.all([loadJobs(1), loadApplications(1)]);
+    await Promise.all([loadJobs(), loadApplications()]);
     setLoading(false);
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadAll();
+    await Promise.all([loadJobs(), loadApplications()]);
     setRefreshing(false);
   };
 
   useEffect(() => {
-    loadAll();
+    const checkUserAndLoad = async () => {
+      const token = await AsyncStorage.getItem("token");
+      const storedUser = await AsyncStorage.getItem("user");
+
+      if (!token || !storedUser) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          })
+        );
+        return;
+      }
+      await loadAll();
+    };
+    checkUserAndLoad();
   }, []);
 
-  const handleLogout = async () => {
-    await logout();
-    if (navigation) navigation.replace("Login");
+  const viewJobDetails = (job) => {
+    setSelectedJob(job);
+    setJobDetailsModal(true);
   };
 
+  const openApplyModal = (job) => {
+    setSelectedJob(job);
+    setApplicationForm({
+      fullName: user?.name || "",
+      email: user?.email || "",
+      phone: "",
+      dob: "",
+      gender: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+      aadhaar: "",
+      pan: "",
+      uan: "",
+      tenthBoard: "",
+      tenthPercentage: "",
+      tenthYear: "",
+      twelfthBoard: "",
+      twelfthPercentage: "",
+      twelfthYear: "",
+      graduationCollege: "",
+      graduationDegree: "",
+      graduationPercentage: "",
+      graduationYear: "",
+      postGraduationCollege: "",
+      postGraduationDegree: "",
+      postGraduationPercentage: "",
+      postGraduationYear: "",
+      experienceYears: "",
+      companyName: "",
+      companyRole: "",
+      startDate: "",
+      endDate: "",
+      previousCompany: "",
+      previousRole: "",
+      skills: "",
+      topSkills: "",
+      github: "",
+      linkedin: "",
+      portfolio: "",
+      coverLetter: "",
+      acceptTerms: false,
+      confirmInformation: false,
+    });
+    setCurrentStep(1);
+    setApplyModal(true);
+  };
+
+  // ✅ HELPER: Validate date format (YYYY-MM-DD)
+  const isValidDate = (dateStr) => {
+    if (!dateStr || dateStr.trim() === "") return true;
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(dateStr)) return false;
+    const date = new Date(dateStr);
+    return date instanceof Date && !isNaN(date);
+  };
+
+  // ✅ VALIDATION FUNCTION WITH DATE CHECK
+  const validateStep = () => {
+    if (currentStep === 1) {
+      if (
+        !applicationForm.fullName ||
+        !applicationForm.email ||
+        !applicationForm.phone
+      ) {
+        Alert.alert("Error", "Please fill Name, Email and Phone");
+        return false;
+      }
+      if (!applicationForm.dob) {
+        Alert.alert("Error", "Please fill Date of Birth");
+        return false;
+      }
+      if (!isValidDate(applicationForm.dob)) {
+        Alert.alert(
+          "Error",
+          "Date of Birth must be YYYY-MM-DD format\nExample: 1990-01-01"
+        );
+        return false;
+      }
+      if (!applicationForm.gender) {
+        Alert.alert("Error", "Please fill Gender");
+        return false;
+      }
+    }
+    if (currentStep === 2) {
+      if (
+        !applicationForm.address ||
+        !applicationForm.city ||
+        !applicationForm.country
+      ) {
+        Alert.alert("Error", "Please fill Address, City and Country");
+        return false;
+      }
+    }
+    if (currentStep === 3) {
+      if (
+        !applicationForm.tenthBoard ||
+        !applicationForm.tenthPercentage ||
+        !applicationForm.tenthYear
+      ) {
+        Alert.alert("Error", "Please fill Class 10th details");
+        return false;
+      }
+    }
+    if (currentStep === 4) {
+      if (
+        applicationForm.startDate &&
+        !isValidDate(applicationForm.startDate)
+      ) {
+        Alert.alert(
+          "Error",
+          "Start Date must be YYYY-MM-DD format\nExample: 2020-01-01"
+        );
+        return false;
+      }
+      if (applicationForm.endDate && !isValidDate(applicationForm.endDate)) {
+        Alert.alert(
+          "Error",
+          "End Date must be YYYY-MM-DD format\nExample: 2024-12-31"
+        );
+        return false;
+      }
+      if (!applicationForm.skills) {
+        Alert.alert("Error", "Please fill Skills (comma separated)");
+        return false;
+      }
+    }
+    if (currentStep === 5) {
+      if (!applicationForm.acceptTerms || !applicationForm.confirmInformation) {
+        Alert.alert("Error", "Please accept terms and confirm information");
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // ✅ SUBMIT APPLICATION WITH FORMDATA
+  const submitApplication = async () => {
+    if (!applicationForm.acceptTerms || !applicationForm.confirmInformation) {
+      Alert.alert("Error", "Please accept terms and confirm information");
+      return;
+    }
+
+    setApplying(true);
+    try {
+      const userStr = await AsyncStorage.getItem("user");
+      let userId = null;
+      if (userStr) {
+        const userData = JSON.parse(userStr);
+        userId = userData?._id || userData?.id || userData?.userId;
+      }
+      if (!userId && user) {
+        userId = user?._id || user?.id || user?.userId;
+      }
+
+      if (!userId) {
+        Alert.alert("Error", "Please login again");
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          })
+        );
+        return;
+      }
+
+      const formData = new FormData();
+
+      // Basic Information
+      formData.append("userId", userId);
+      formData.append("jobId", selectedJob._id);
+      formData.append("fullName", applicationForm.fullName || "");
+      formData.append("email", applicationForm.email || "");
+      formData.append("phone", applicationForm.phone || "");
+      formData.append("dob", applicationForm.dob || "");
+      formData.append("gender", applicationForm.gender || "");
+
+      // Address
+      formData.append("address", applicationForm.address || "");
+      formData.append("city", applicationForm.city || "");
+      formData.append("state", applicationForm.state || "");
+      formData.append("country", applicationForm.country || "");
+      formData.append("pincode", applicationForm.pincode || "");
+      formData.append("aadhaar", applicationForm.aadhaar || "");
+      formData.append("pan", applicationForm.pan || "");
+      formData.append("uan", applicationForm.uan || "");
+
+      // Education - 10th
+      formData.append("tenthBoard", applicationForm.tenthBoard || "");
+      formData.append(
+        "tenthPercentage",
+        applicationForm.tenthPercentage || "0"
+      );
+      formData.append("tenthYear", applicationForm.tenthYear || "0");
+
+      // Education - 12th
+      formData.append("twelfthBoard", applicationForm.twelfthBoard || "");
+      formData.append(
+        "twelfthPercentage",
+        applicationForm.twelfthPercentage || "0"
+      );
+      formData.append("twelfthYear", applicationForm.twelfthYear || "0");
+
+      // Graduation
+      formData.append(
+        "graduationCollege",
+        applicationForm.graduationCollege || ""
+      );
+      formData.append(
+        "graduationDegree",
+        applicationForm.graduationDegree || ""
+      );
+      formData.append(
+        "graduationPercentage",
+        applicationForm.graduationPercentage || "0"
+      );
+      formData.append("graduationYear", applicationForm.graduationYear || "0");
+
+      // Post Graduation
+      formData.append(
+        "postGraduationCollege",
+        applicationForm.postGraduationCollege || ""
+      );
+      formData.append(
+        "postGraduationDegree",
+        applicationForm.postGraduationDegree || ""
+      );
+      formData.append(
+        "postGraduationPercentage",
+        applicationForm.postGraduationPercentage || "0"
+      );
+      formData.append(
+        "postGraduationYear",
+        applicationForm.postGraduationYear || "0"
+      );
+
+      // Experience
+      formData.append("experienceYears", applicationForm.experienceYears || "");
+      formData.append("companyName", applicationForm.companyName || "");
+      formData.append("companyRole", applicationForm.companyRole || "");
+      formData.append("startDate", applicationForm.startDate || "");
+      formData.append("endDate", applicationForm.endDate || "");
+      formData.append("previousCompany", applicationForm.previousCompany || "");
+      formData.append("previousRole", applicationForm.previousRole || "");
+
+      // Skills
+      const skillsArray = applicationForm.skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const topSkillsArray = applicationForm.topSkills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      formData.append("skills", JSON.stringify(skillsArray));
+      formData.append("topSkills", JSON.stringify(topSkillsArray));
+
+      // Links
+      formData.append("github", applicationForm.github || "");
+      formData.append("linkedin", applicationForm.linkedin || "");
+      formData.append("portfolio", applicationForm.portfolio || "");
+
+      // Cover Letter & Terms
+      formData.append("coverLetter", applicationForm.coverLetter || "");
+      formData.append(
+        "acceptTerms",
+        applicationForm.acceptTerms ? "true" : "false"
+      );
+      formData.append(
+        "confirmInformation",
+        applicationForm.confirmInformation ? "true" : "false"
+      );
+      formData.append("status", "Applied");
+      formData.append("aiScore", "0");
+
+      const result = await apiClient.post(
+        "/applications/apply",
+        formData,
+        true,
+        true
+      );
+
+      if (result.success) {
+        Alert.alert("Success", "Application submitted successfully!");
+        setApplyModal(false);
+        await loadApplications();
+      } else {
+        Alert.alert(
+          "Error",
+          result.message || result.error || "Failed to submit"
+        );
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
+      Alert.alert("Error", "Network error. Please try again.");
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const handleLogoutPress = () => setLogoutModalVisible(true);
+
+  const confirmLogout = async () => {
+    setLogoutModalVisible(false);
+    setLoading(true);
+    try {
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("user");
+      await logout();
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Login" }],
+        })
+      );
+    } catch (error) {
+      navigation.replace("Login");
+    }
+  };
+
+  const safeJobs = Array.isArray(jobs) ? jobs : [];
+  const safeApps = Array.isArray(applications) ? applications : [];
+
   const filteredJobs = safeJobs.filter(
-    (job) =>
-      job.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.company?.toLowerCase().includes(searchQuery.toLowerCase())
+    (j) =>
+      j.title?.toLowerCase().includes(jobSearch.toLowerCase()) ||
+      j.company?.toLowerCase().includes(jobSearch.toLowerCase())
   );
 
-  const Pagination = ({ page, totalPages, onPageChange }) => {
-    if (totalPages <= 1) return null;
-    return (
-      <View style={styles.paginationContainer}>
-        <TouchableOpacity
-          style={[styles.pageBtn, page === 1 && styles.pageBtnDisabled]}
-          onPress={() => page > 1 && onPageChange(page - 1)}
-          disabled={page === 1}>
-          <Text style={styles.pageBtnText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.pageInfo}>
-          Page {page} of {totalPages}
-        </Text>
-        <TouchableOpacity
-          style={[
-            styles.pageBtn,
-            page === totalPages && styles.pageBtnDisabled,
-          ]}
-          onPress={() => page < totalPages && onPageChange(page + 1)}
-          disabled={page === totalPages}>
-          <Text style={styles.pageBtnText}>→</Text>
-        </TouchableOpacity>
-      </View>
-    );
+  const stats = {
+    totalApplications: safeApps.length,
+    pending: safeApps.filter((a) => a.status?.toLowerCase() === "applied")
+      .length,
+    shortlisted: safeApps.filter(
+      (a) => a.status?.toLowerCase() === "shortlisted"
+    ).length,
+    hired: safeApps.filter((a) => a.status?.toLowerCase() === "hired").length,
+  };
+
+  const renderStep = () => {
+    if (currentStep === 1) {
+      return (
+        <>
+          <Text style={styles.stepTitle}>Personal Information</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Full Name *"
+            placeholderTextColor="#666"
+            value={applicationForm.fullName}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, fullName: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email *"
+            placeholderTextColor="#666"
+            keyboardType="email-address"
+            value={applicationForm.email}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, email: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Phone *"
+            placeholderTextColor="#666"
+            keyboardType="phone-pad"
+            value={applicationForm.phone}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, phone: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Date of Birth (YYYY-MM-DD) * Example: 1990-01-01"
+            placeholderTextColor="#666"
+            value={applicationForm.dob}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, dob: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Gender (Male/Female/Other) *"
+            placeholderTextColor="#666"
+            value={applicationForm.gender}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, gender: t })
+            }
+          />
+        </>
+      );
+    }
+    if (currentStep === 2) {
+      return (
+        <>
+          <Text style={styles.stepTitle}>Address & IDs</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Address *"
+            placeholderTextColor="#666"
+            value={applicationForm.address}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, address: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="City *"
+            placeholderTextColor="#666"
+            value={applicationForm.city}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, city: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="State"
+            placeholderTextColor="#666"
+            value={applicationForm.state}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, state: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Country *"
+            placeholderTextColor="#666"
+            value={applicationForm.country}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, country: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Pincode"
+            placeholderTextColor="#666"
+            keyboardType="numeric"
+            value={applicationForm.pincode}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, pincode: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Aadhaar Number"
+            placeholderTextColor="#666"
+            value={applicationForm.aadhaar}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, aadhaar: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="PAN Number"
+            placeholderTextColor="#666"
+            value={applicationForm.pan}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, pan: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="UAN Number"
+            placeholderTextColor="#666"
+            value={applicationForm.uan}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, uan: t })
+            }
+          />
+        </>
+      );
+    }
+    if (currentStep === 3) {
+      return (
+        <>
+          <Text style={styles.stepTitle}>Education</Text>
+          <Text style={styles.subStepTitle}>Class 10th *</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Board"
+            placeholderTextColor="#666"
+            value={applicationForm.tenthBoard}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, tenthBoard: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Percentage"
+            placeholderTextColor="#666"
+            keyboardType="numeric"
+            value={applicationForm.tenthPercentage}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, tenthPercentage: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Year of Passing"
+            placeholderTextColor="#666"
+            keyboardType="numeric"
+            value={applicationForm.tenthYear}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, tenthYear: t })
+            }
+          />
+          <Text style={styles.subStepTitle}>Class 12th</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Board"
+            placeholderTextColor="#666"
+            value={applicationForm.twelfthBoard}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, twelfthBoard: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Percentage"
+            placeholderTextColor="#666"
+            keyboardType="numeric"
+            value={applicationForm.twelfthPercentage}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, twelfthPercentage: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Year of Passing"
+            placeholderTextColor="#666"
+            keyboardType="numeric"
+            value={applicationForm.twelfthYear}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, twelfthYear: t })
+            }
+          />
+        </>
+      );
+    }
+    if (currentStep === 4) {
+      return (
+        <>
+          <Text style={styles.stepTitle}>Experience & Skills</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Total Years of Experience"
+            placeholderTextColor="#666"
+            value={applicationForm.experienceYears}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, experienceYears: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Current Company Name"
+            placeholderTextColor="#666"
+            value={applicationForm.companyName}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, companyName: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Current Role"
+            placeholderTextColor="#666"
+            value={applicationForm.companyRole}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, companyRole: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Start Date (YYYY-MM-DD) Example: 2020-01-01"
+            placeholderTextColor="#666"
+            value={applicationForm.startDate}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, startDate: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="End Date (YYYY-MM-DD) Example: 2024-12-31"
+            placeholderTextColor="#666"
+            value={applicationForm.endDate}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, endDate: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Skills (comma separated) * Example: React, Node, Python"
+            placeholderTextColor="#666"
+            value={applicationForm.skills}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, skills: t })
+            }
+          />
+        </>
+      );
+    }
+    if (currentStep === 5) {
+      return (
+        <>
+          <Text style={styles.stepTitle}>Links & Cover Letter</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="GitHub URL"
+            placeholderTextColor="#666"
+            value={applicationForm.github}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, github: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="LinkedIn URL"
+            placeholderTextColor="#666"
+            value={applicationForm.linkedin}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, linkedin: t })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Portfolio URL"
+            placeholderTextColor="#666"
+            value={applicationForm.portfolio}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, portfolio: t })
+            }
+          />
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Cover Letter"
+            placeholderTextColor="#666"
+            multiline
+            numberOfLines={4}
+            value={applicationForm.coverLetter}
+            onChangeText={(t) =>
+              setApplicationForm({ ...applicationForm, coverLetter: t })
+            }
+          />
+          <TouchableOpacity
+            style={styles.checkboxRow}
+            onPress={() =>
+              setApplicationForm({
+                ...applicationForm,
+                acceptTerms: !applicationForm.acceptTerms,
+              })
+            }>
+            <View
+              style={[
+                styles.checkbox,
+                applicationForm.acceptTerms && styles.checkboxChecked,
+              ]}
+            />
+            <Text style={styles.checkboxLabel}>
+              I accept the terms and conditions *
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.checkboxRow}
+            onPress={() =>
+              setApplicationForm({
+                ...applicationForm,
+                confirmInformation: !applicationForm.confirmInformation,
+              })
+            }>
+            <View
+              style={[
+                styles.checkbox,
+                applicationForm.confirmInformation && styles.checkboxChecked,
+              ]}
+            />
+            <Text style={styles.checkboxLabel}>
+              I confirm that all information is correct *
+            </Text>
+          </TouchableOpacity>
+        </>
+      );
+    }
+    return null;
   };
 
   if (loading) {
@@ -400,259 +865,847 @@ export default function UserDashboard({ navigation }) {
     );
   }
 
-  const renderJobs = () => (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor="#7C3AED"
-        />
-      }>
-      <View style={styles.header}>
-        <Text style={styles.welcomeText}>Find Your Dream Job</Text>
-        <Text style={styles.userName}>
-          Hello, {user?.name?.split(" ")[0] || "User"}! 👋
-        </Text>
-      </View>
-      <View style={styles.searchWrap}>
-        <View style={styles.searchIcon}>
-          <Icon.Search />
-        </View>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search jobs by title or company..."
-          placeholderTextColor="#666"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-      {filteredJobs.length === 0 ? (
-        <Text style={styles.emptyText}>No jobs found</Text>
-      ) : (
-        filteredJobs.map((job) => (
-          <View key={job._id} style={styles.jobCard}>
-            <Text style={styles.jobTitle}>{job.title}</Text>
-            <Text style={styles.jobCompany}>{job.company}</Text>
-            <View style={styles.jobMeta}>
-              <Text style={styles.metaText}>
-                <Icon.MapPin /> {job.location || "Remote"}
-              </Text>
-              <Text style={styles.metaText}>
-                <Icon.DollarSign /> {job.salary || "Negotiable"}
-              </Text>
-            </View>
-            <View style={styles.badgeRow}>
-              <Text style={styles.badge}>{job.type || "Full Time"}</Text>
-              {job.experienceRequired && (
-                <Text style={styles.badge}>{job.experienceRequired}</Text>
-              )}
-            </View>
-            {job.skillsRequired?.length > 0 && (
-              <View style={styles.skillsRow}>
-                {job.skillsRequired.slice(0, 3).map((s, i) => (
-                  <Text key={i} style={styles.skillBadge}>
-                    {s}
-                  </Text>
-                ))}
-                {job.skillsRequired.length > 3 && (
-                  <Text style={styles.skillBadge}>
-                    +{job.skillsRequired.length - 3}
-                  </Text>
-                )}
-              </View>
-            )}
-          </View>
-        ))
-      )}
-      <Pagination
-        page={jobsPage}
-        totalPages={jobsTotalPages}
-        onPageChange={(p) => {
-          loadJobs(p);
-          setJobsPage(p);
-        }}
-      />
-    </ScrollView>
-  );
-
-  const renderApplications = () => (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor="#7C3AED"
-        />
-      }>
-      <View style={styles.header}>
-        <Text style={styles.welcomeText}>Your Applications</Text>
-        <Text style={styles.userName}>Track Status</Text>
-      </View>
-      {safeApplications.length === 0 ? (
-        <Text style={styles.emptyText}>No applications found</Text>
-      ) : (
-        safeApplications.map((app) => (
-          <View key={app._id} style={styles.appCard}>
-            <View style={styles.appCardRow}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>
-                  {(app.jobId?.title || "J")[0]}
-                </Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.appName}>
-                  {app.jobId?.title || "Job Position"}
-                </Text>
-                <Text style={styles.appRole}>
-                  {app.jobId?.company || "Company"}
-                </Text>
-              </View>
-              <View
-                style={[
-                  styles.statusPill,
-                  { backgroundColor: statusColor(app.status) + "20" },
-                ]}>
-                <Text
-                  style={[
-                    styles.statusText,
-                    { color: statusColor(app.status) },
-                  ]}>
-                  {statusLabel(app.status)}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.dateRow}>
-              <Icon.Calendar />
-              <Text style={styles.dateText}>
-                Applied:{" "}
-                {app.createdAt
-                  ? new Date(app.createdAt).toLocaleDateString()
-                  : "Recent"}
-              </Text>
-            </View>
-          </View>
-        ))
-      )}
-      <Pagination
-        page={appsPage}
-        totalPages={appsTotalPages}
-        onPageChange={(p) => {
-          loadApplications(p);
-          setAppsPage(p);
-        }}
-      />
-    </ScrollView>
-  );
-
-  const renderProfile = () => (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={styles.profileTop}>
-        <View style={styles.profileAvatar}>
-          <Text style={styles.profileAvatarText}>{user?.name?.[0] || "U"}</Text>
-        </View>
-        <Text style={styles.profileName}>{user?.name || "User"}</Text>
-        <Text style={styles.profileEmail}>
-          {user?.email || "user@example.com"}
-        </Text>
-        <View style={styles.profileBadge}>
-          <Icon.User />
-          <Text style={styles.profileBadgeText}>Job Seeker</Text>
-        </View>
-      </View>
-      <View style={styles.profileSection}>
-        <Text style={styles.profileSectionTitle}>Account Settings</Text>
-        <TouchableOpacity style={styles.profileItem}>
-          <View style={styles.profileItemIcon}>
-            <Icon.User />
-          </View>
-          <View style={styles.profileItemText}>
-            <Text style={styles.profileItemTitle}>Personal Info</Text>
-            <Text style={styles.profileItemDesc}>
-              Update your profile information
-            </Text>
-          </View>
-          <Icon.ChevronRight />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.profileItem}>
-          <View style={styles.profileItemIcon}>
-            <Icon.Bell />
-          </View>
-          <View style={styles.profileItemText}>
-            <Text style={styles.profileItemTitle}>Notifications</Text>
-            <Text style={styles.profileItemDesc}>
-              Manage your notification preferences
-            </Text>
-          </View>
-          <Icon.ChevronRight />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.profileItem}>
-          <View style={styles.profileItemIcon}>
-            <Icon.HelpCircle />
-          </View>
-          <View style={styles.profileItemText}>
-            <Text style={styles.profileItemTitle}>Help & Support</Text>
-            <Text style={styles.profileItemDesc}>
-              Get help or contact support
-            </Text>
-          </View>
-          <Icon.ChevronRight />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.profileItem, styles.logoutItem]}
-          onPress={handleLogout}>
-          <View
-            style={[styles.profileItemIcon, { backgroundColor: "#FF444415" }]}>
-            <Icon.LogOut />
-          </View>
-          <Text style={[styles.profileItemTitle, styles.logoutText]}>
-            Logout
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
-  );
-
   return (
     <View style={styles.container}>
-      <View style={{ flex: 1, marginBottom: 70 }}>
-        {tab === "jobs" && renderJobs()}
-        {tab === "applications" && renderApplications()}
-        {tab === "profile" && renderProfile()}
+      <StatusBar barStyle="light-content" backgroundColor="#0B0D1A" />
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.welcomeText}>Welcome back,</Text>
+          <Text style={styles.userName}>{user?.name || "User"}</Text>
+          <Text style={styles.userEmail}>{user?.email || ""}</Text>
+        </View>
       </View>
 
-      <View style={styles.nav}>
-        <TouchableOpacity style={styles.navItem} onPress={() => setTab("jobs")}>
-          <Icon.Briefcase />
+      <View style={styles.bottomNav}>
+        <TouchableOpacity
+          style={[styles.navItem, activeTab === "jobs" && styles.navItemActive]}
+          onPress={() => setActiveTab("jobs")}>
           <Text
-            style={[styles.navText, tab === "jobs" && styles.navTextActive]}>
+            style={[
+              styles.navText,
+              activeTab === "jobs" && styles.navTextActive,
+            ]}>
             Jobs
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => setTab("applications")}>
-          <Icon.FileText />
+          style={[
+            styles.navItem,
+            activeTab === "applications" && styles.navItemActive,
+          ]}
+          onPress={() => setActiveTab("applications")}>
           <Text
             style={[
               styles.navText,
-              tab === "applications" && styles.navTextActive,
+              activeTab === "applications" && styles.navTextActive,
             ]}>
-            Applications
+            Applied
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => setTab("profile")}>
-          <Icon.User />
+          style={[
+            styles.navItem,
+            activeTab === "profile" && styles.navItemActive,
+          ]}
+          onPress={() => setActiveTab("profile")}>
           <Text
-            style={[styles.navText, tab === "profile" && styles.navTextActive]}>
+            style={[
+              styles.navText,
+              activeTab === "profile" && styles.navTextActive,
+            ]}>
             Profile
           </Text>
         </TouchableOpacity>
       </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#7C3AED"
+          />
+        }>
+        {activeTab === "applications" && (
+          <View style={styles.statsGrid}>
+            <View style={styles.statCard}>
+              <Text style={[styles.statNumber, { color: "#3B82F6" }]}>
+                {stats.totalApplications}
+              </Text>
+              <Text style={styles.statLabel}>Total</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={[styles.statNumber, { color: "#F59E0B" }]}>
+                {stats.pending}
+              </Text>
+              <Text style={styles.statLabel}>Pending</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={[styles.statNumber, { color: "#10B981" }]}>
+                {stats.shortlisted}
+              </Text>
+              <Text style={styles.statLabel}>Shortlisted</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={[styles.statNumber, { color: "#8B5CF6" }]}>
+                {stats.hired}
+              </Text>
+              <Text style={styles.statLabel}>Hired</Text>
+            </View>
+          </View>
+        )}
+
+        {activeTab === "jobs" && (
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search jobs by title or company..."
+              placeholderTextColor="#666"
+              value={jobSearch}
+              onChangeText={setJobSearch}
+            />
+          </View>
+        )}
+
+        {activeTab === "jobs" && (
+          <>
+            {filteredJobs.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyTitle}>No jobs found</Text>
+              </View>
+            ) : (
+              filteredJobs.map((job) => (
+                <View key={job._id} style={styles.jobCard}>
+                  <Text style={styles.jobTitle}>
+                    {job.title || job.profile}
+                  </Text>
+                  <Text style={styles.jobCompany}>{job.company}</Text>
+                  <View style={styles.tagsRow}>
+                    <View style={styles.tag}>
+                      <Text style={styles.tagText}>
+                        {job.type || "Full Time"}
+                      </Text>
+                    </View>
+                    <View style={styles.tag}>
+                      <Text style={styles.tagText}>
+                        {job.location || "Remote"}
+                      </Text>
+                    </View>
+                    {job.salary && (
+                      <View style={styles.tag}>
+                        <Text style={styles.tagText}>{job.salary}</Text>
+                      </View>
+                    )}
+                  </View>
+                  {job.skillsRequired?.length > 0 && (
+                    <View style={styles.skillsRow}>
+                      {job.skillsRequired.slice(0, 3).map((skill, i) => (
+                        <View key={i} style={styles.skillTag}>
+                          <Text style={styles.skillText}>{skill}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                  <View style={styles.buttonRow}>
+                    <TouchableOpacity
+                      style={styles.detailsBtn}
+                      onPress={() => viewJobDetails(job)}>
+                      <Text style={styles.detailsBtnText}>View Details</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.applyBtn}
+                      onPress={() => openApplyModal(job)}>
+                      <Text style={styles.applyBtnText}>Apply Now</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))
+            )}
+          </>
+        )}
+
+        {activeTab === "applications" && (
+          <>
+            {safeApps.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyTitle}>No applications yet</Text>
+                <Text style={styles.emptyText}>
+                  Apply for jobs to see them here
+                </Text>
+              </View>
+            ) : (
+              safeApps.map((app) => (
+                <TouchableOpacity
+                  key={app._id}
+                  style={styles.appCard}
+                  onPress={() => {
+                    setSelectedApp(app);
+                    setViewAppModal(true);
+                  }}>
+                  <Text style={styles.appJobTitle}>
+                    {app.jobId?.title || "Unknown Position"}
+                  </Text>
+                  <Text style={styles.appCompany}>
+                    {app.jobId?.company || "Unknown Company"}
+                  </Text>
+                  <Text style={styles.appDate}>
+                    Applied: {new Date(app.createdAt).toLocaleDateString()}
+                  </Text>
+                  <View style={styles.appStatusRow}>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: "#F59E0B20" },
+                      ]}>
+                      <Text style={[styles.statusText, { color: "#F59E0B" }]}>
+                        {app.status || "Applied"}
+                      </Text>
+                    </View>
+                    <Text style={styles.appScore}>
+                      Match: {app.aiScore || 0}%
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </>
+        )}
+
+        {activeTab === "profile" && (
+          <View>
+            <View style={styles.profileTop}>
+              <View style={styles.profileAvatar}>
+                <Text style={styles.profileAvatarText}>
+                  {user?.name?.[0] || "U"}
+                </Text>
+              </View>
+              <Text style={styles.profileName}>{user?.name || "User"}</Text>
+              <Text style={styles.profileEmail}>
+                {user?.email || "user@example.com"}
+              </Text>
+              <View style={styles.profileBadge}>
+                <Text style={styles.profileBadgeText}>Job Seeker Account</Text>
+              </View>
+            </View>
+            <View style={styles.profileSection}>
+              <Text style={styles.sectionTitle}>Account Settings</Text>
+              <TouchableOpacity style={styles.menuItem}>
+                <View>
+                  <Text style={styles.menuTitle}>Personal Information</Text>
+                  <Text style={styles.menuDesc}>
+                    Update your personal details
+                  </Text>
+                </View>
+                <Text style={styles.arrow}>→</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem}>
+                <View>
+                  <Text style={styles.menuTitle}>Resume & Documents</Text>
+                  <Text style={styles.menuDesc}>
+                    Upload and manage your resume
+                  </Text>
+                </View>
+                <Text style={styles.arrow}>→</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem}>
+                <View>
+                  <Text style={styles.menuTitle}>Notifications</Text>
+                  <Text style={styles.menuDesc}>
+                    Manage notification preferences
+                  </Text>
+                </View>
+                <Text style={styles.arrow}>→</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogoutPress}>
+                <Text style={styles.logoutButtonText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Modals */}
+      <Modal visible={logoutModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.confirmModal}>
+            <Text style={styles.confirmTitle}>Confirm Logout</Text>
+            <Text style={styles.confirmText}>
+              Are you sure you want to logout?
+            </Text>
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity
+                style={[styles.confirmBtn, styles.cancelConfirmBtn]}
+                onPress={() => setLogoutModalVisible(false)}>
+                <Text style={styles.cancelConfirmText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.confirmBtn, styles.logoutConfirmBtn]}
+                onPress={confirmLogout}>
+                <Text style={styles.logoutConfirmText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={jobDetailsModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Job Details</Text>
+              <TouchableOpacity onPress={() => setJobDetailsModal(false)}>
+                <Text style={styles.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {selectedJob && (
+                <>
+                  <Text style={styles.modalJobTitle}>
+                    {selectedJob.title || selectedJob.profile}
+                  </Text>
+                  <Text style={styles.modalJobCompany}>
+                    {selectedJob.company}
+                  </Text>
+                  <View style={styles.detailBox}>
+                    <Text style={styles.detailLabel}>Location</Text>
+                    <Text style={styles.detailText}>
+                      {selectedJob.location || "Remote"}
+                    </Text>
+                  </View>
+                  <View style={styles.detailBox}>
+                    <Text style={styles.detailLabel}>Salary</Text>
+                    <Text style={styles.detailText}>
+                      {selectedJob.salary || "Negotiable"}
+                    </Text>
+                  </View>
+                  <View style={styles.detailBox}>
+                    <Text style={styles.detailLabel}>Job Type</Text>
+                    <Text style={styles.detailText}>
+                      {selectedJob.type || "Full Time"}
+                    </Text>
+                  </View>
+                  <View style={styles.detailBox}>
+                    <Text style={styles.detailLabel}>Experience</Text>
+                    <Text style={styles.detailText}>
+                      {selectedJob.experienceRequired || "Fresher"}
+                    </Text>
+                  </View>
+                  {selectedJob.skillsRequired?.length > 0 && (
+                    <View style={styles.detailBox}>
+                      <Text style={styles.detailLabel}>Skills Required</Text>
+                      <View style={styles.skillsRow}>
+                        {selectedJob.skillsRequired.map((skill, i) => (
+                          <View key={i} style={styles.skillTag}>
+                            <Text style={styles.skillText}>{skill}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )}
+                  <View style={styles.detailBox}>
+                    <Text style={styles.detailLabel}>Description</Text>
+                    <Text style={styles.detailText}>
+                      {selectedJob.description || "No description provided"}
+                    </Text>
+                  </View>
+                </>
+              )}
+            </ScrollView>
+            <View style={styles.modalFooter}>
+              <TouchableOpacity
+                style={styles.modalApplyBtn}
+                onPress={() => {
+                  setJobDetailsModal(false);
+                  openApplyModal(selectedJob);
+                }}>
+                <Text style={styles.modalApplyBtnText}>Apply Now</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={applyModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { maxHeight: height * 0.9 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                Apply for {selectedJob?.title}
+              </Text>
+              <TouchableOpacity onPress={() => setApplyModal(false)}>
+                <Text style={styles.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView>{renderStep()}</ScrollView>
+            <View style={styles.modalFooter}>
+              {currentStep > 1 && (
+                <TouchableOpacity
+                  style={styles.prevBtn}
+                  onPress={() => setCurrentStep(currentStep - 1)}>
+                  <Text style={styles.prevBtnText}>Previous</Text>
+                </TouchableOpacity>
+              )}
+              {currentStep < 5 ? (
+                <TouchableOpacity
+                  style={styles.nextBtn}
+                  onPress={() => {
+                    if (validateStep()) setCurrentStep(currentStep + 1);
+                  }}>
+                  <Text style={styles.nextBtnText}>Next</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.submitBtn}
+                  onPress={submitApplication}
+                  disabled={applying}>
+                  <Text style={styles.submitBtnText}>
+                    {applying ? "Submitting..." : "Submit Application"}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={viewAppModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { maxHeight: height * 0.85 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Application Details</Text>
+              <TouchableOpacity onPress={() => setViewAppModal(false)}>
+                <Text style={styles.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {selectedApp && (
+                <>
+                  <Text style={styles.appDetailName}>
+                    {selectedApp.fullName || selectedApp.name}
+                  </Text>
+                  <Text style={styles.appDetailEmail}>{selectedApp.email}</Text>
+                  <View style={styles.detailBox}>
+                    <Text style={styles.detailLabel}>Job Position</Text>
+                    <Text style={styles.detailText}>
+                      {selectedApp.jobId?.title || "Unknown"}
+                    </Text>
+                  </View>
+                  <View style={styles.detailBox}>
+                    <Text style={styles.detailLabel}>Status</Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        {
+                          backgroundColor: "#F59E0B20",
+                          alignSelf: "flex-start",
+                        },
+                      ]}>
+                      <Text style={[styles.statusText, { color: "#F59E0B" }]}>
+                        {selectedApp.status || "Applied"}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.detailBox}>
+                    <Text style={styles.detailLabel}>Match Score</Text>
+                    <Text style={styles.detailText}>
+                      {selectedApp.aiScore || 0}%
+                    </Text>
+                  </View>
+                  {selectedApp.phone && (
+                    <View style={styles.detailBox}>
+                      <Text style={styles.detailLabel}>Phone</Text>
+                      <Text style={styles.detailText}>{selectedApp.phone}</Text>
+                    </View>
+                  )}
+                  {selectedApp.coverLetter && (
+                    <View style={styles.detailBox}>
+                      <Text style={styles.detailLabel}>Cover Letter</Text>
+                      <Text style={styles.detailText}>
+                        {selectedApp.coverLetter}
+                      </Text>
+                    </View>
+                  )}
+                  <View style={styles.detailBox}>
+                    <Text style={styles.detailLabel}>Applied On</Text>
+                    <Text style={styles.detailText}>
+                      {new Date(selectedApp.createdAt).toLocaleDateString()}
+                    </Text>
+                  </View>
+                </>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#0B0D1A" },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#0B0D1A",
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === "ios" ? 60 : 40,
+    paddingBottom: 20,
+  },
+  welcomeText: { fontSize: 14, color: "#888" },
+  userName: { fontSize: 24, fontWeight: "bold", color: "#fff", marginTop: 4 },
+  userEmail: { fontSize: 13, color: "#666", marginTop: 2 },
+  statsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 16,
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+    alignItems: "center",
+  },
+  statNumber: { fontSize: 28, fontWeight: "bold" },
+  statLabel: { fontSize: 12, color: "#888", marginTop: 4 },
+  bottomNav: {
+    flexDirection: "row",
+    backgroundColor: "#0F1225",
+    borderTopWidth: 1,
+    borderTopColor: "#1E2240",
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    marginBottom: 16,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  navItemActive: { backgroundColor: "#7C3AED20" },
+  navText: { fontSize: 14, color: "#888", fontWeight: "500" },
+  navTextActive: { color: "#7C3AED", fontWeight: "bold" },
+  searchContainer: {
+    backgroundColor: "#131629",
+    marginHorizontal: 16,
+    marginBottom: 16,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  searchInput: { paddingVertical: 12, color: "#fff", fontSize: 14 },
+  jobCard: {
+    backgroundColor: "#131629",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+    gap: 8,
+  },
+  jobTitle: { fontSize: 16, fontWeight: "bold", color: "#fff" },
+  jobCompany: { fontSize: 13, color: "#888", marginTop: 2 },
+  tagsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
+  tag: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  tagText: { fontSize: 11, color: "#AAA" },
+  skillsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
+  skillTag: {
+    backgroundColor: "#7C3AED20",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  skillText: { fontSize: 11, color: "#9B8EFF" },
+  buttonRow: { flexDirection: "row", gap: 12, marginTop: 12 },
+  detailsBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#7C3AED",
+    alignItems: "center",
+  },
+  detailsBtnText: { color: "#7C3AED", fontWeight: "600" },
+  applyBtn: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  applyBtnText: { color: "#fff", fontWeight: "600" },
+  appCard: {
+    backgroundColor: "#131629",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  appJobTitle: { fontSize: 16, fontWeight: "bold", color: "#fff" },
+  appCompany: { fontSize: 13, color: "#888", marginTop: 2 },
+  appDate: { fontSize: 12, color: "#666", marginTop: 4 },
+  appStatusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  statusText: { fontSize: 11, fontWeight: "bold" },
+  appScore: { fontSize: 12, color: "#7C3AED", fontWeight: "600" },
+  emptyState: { alignItems: "center", paddingVertical: 60 },
+  emptyTitle: { fontSize: 16, color: "#888" },
+  emptyText: { fontSize: 14, color: "#666", marginTop: 8 },
+  profileTop: {
+    alignItems: "center",
+    paddingTop: 20,
+    paddingBottom: 24,
+    gap: 8,
+  },
+  profileAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#1A1D35",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#2A2E50",
+  },
+  profileAvatarText: { fontSize: 32, fontWeight: "bold", color: "#9B8EFF" },
+  profileName: { fontSize: 20, fontWeight: "bold", color: "#fff" },
+  profileEmail: { fontSize: 14, color: "#888" },
+  profileBadge: {
+    paddingHorizontal: 18,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  profileBadgeText: { fontSize: 14, color: "#9B8EFF" },
+  profileSection: { paddingHorizontal: 16, marginTop: 8, marginBottom: 30 },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 16,
+  },
+  menuItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#131629",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  menuTitle: { fontSize: 15, fontWeight: "600", color: "#fff" },
+  menuDesc: { fontSize: 12, color: "#888", marginTop: 2 },
+  arrow: { fontSize: 18, color: "#666" },
+  logoutButton: {
+    backgroundColor: "#EF4444",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  logoutButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#131629",
+    borderRadius: 24,
+    width: width * 0.95,
+    maxHeight: height * 0.9,
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  modalTitle: { fontSize: 20, fontWeight: "bold", color: "#fff" },
+  modalClose: { fontSize: 24, color: "#888", fontWeight: "bold" },
+  modalFooter: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#1E2240",
+  },
+  modalApplyBtn: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  modalApplyBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  modalJobTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 4,
+  },
+  modalJobCompany: { fontSize: 15, color: "#888", marginBottom: 16 },
+  input: {
+    backgroundColor: "#1E2240",
+    borderRadius: 12,
+    padding: 14,
+    color: "#fff",
+    fontSize: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  textArea: { height: 100, textAlignVertical: "top" },
+  prevBtn: {
+    flex: 1,
+    backgroundColor: "#1E2240",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  prevBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  nextBtn: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  nextBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  submitBtn: {
+    flex: 1,
+    backgroundColor: "#10B981",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  submitBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  detailBox: {
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  detailLabel: {
+    fontSize: 12,
+    color: "#7C3AED",
+    marginBottom: 4,
+    fontWeight: "600",
+  },
+  detailText: { fontSize: 14, color: "#DDD" },
+  appDetailName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  appDetailEmail: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  stepTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#7C3AED",
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  subStepTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#9B8EFF",
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 12,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#7C3AED",
+    backgroundColor: "transparent",
+  },
+  checkboxChecked: { backgroundColor: "#7C3AED" },
+  checkboxLabel: { fontSize: 13, color: "#DDD", flex: 1 },
+  confirmModal: {
+    backgroundColor: "#131629",
+    borderRadius: 20,
+    padding: 24,
+    width: width - 60,
+    alignSelf: "center",
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  confirmTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  confirmText: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  confirmButtons: { flexDirection: "row", gap: 12 },
+  confirmBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  cancelConfirmBtn: { backgroundColor: "#1E2240" },
+  logoutConfirmBtn: { backgroundColor: "#EF4444" },
+  cancelConfirmText: { color: "#888", fontWeight: "600" },
+  logoutConfirmText: { color: "#fff", fontWeight: "600" },
+});

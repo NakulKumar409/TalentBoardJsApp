@@ -14,6 +14,7 @@ import {
   StatusBar,
   Platform,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import apiClient from "../core/api/apiClient";
 import { useAuth } from "../core/auth/AuthContext";
 import { CommonActions } from "@react-navigation/native";
@@ -52,6 +53,7 @@ export default function EmployerDashboard({ navigation }) {
   const [jobSearch, setJobSearch] = useState("");
   const [appSearch, setAppSearch] = useState("");
   const [appFilter, setAppFilter] = useState("All");
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -251,28 +253,35 @@ export default function EmployerDashboard({ navigation }) {
     setModalVisible(true);
   };
 
-  // FIXED LOGOUT - Only in Profile Tab
-  const handleLogout = async () => {
-    Alert.alert("Confirm", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await logout();
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: "Login" }],
-              })
-            );
-          } catch (error) {
-            navigation.replace("Login");
-          }
-        },
-      },
-    ]);
+  // FIXED LOGOUT FUNCTIONS
+  const handleLogoutPress = () => {
+    setLogoutModalVisible(true);
+  };
+
+  const confirmLogout = async () => {
+    setLogoutModalVisible(false);
+    setLoading(true);
+
+    try {
+      // Clear AsyncStorage directly
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("user");
+
+      // Call logout from context
+      await logout();
+
+      // Reset navigation to Login screen
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Login" }],
+        })
+      );
+    } catch (error) {
+      console.log("Logout error:", error);
+      // Force navigate even if error
+      navigation.replace("Login");
+    }
   };
 
   const safeJobs = Array.isArray(jobs) ? jobs : [];
@@ -708,7 +717,7 @@ export default function EmployerDashboard({ navigation }) {
           </>
         )}
 
-        {/* Profile Tab - Logout Button Here Only */}
+        {/* Profile Tab */}
         {activeTab === "profile" && (
           <View>
             <View style={styles.profileTop}>
@@ -751,16 +760,44 @@ export default function EmployerDashboard({ navigation }) {
                 <Text style={styles.arrow}>→</Text>
               </TouchableOpacity>
 
-              {/* Logout Button - Only Here */}
+              {/* Logout Button - Fixed */}
               <TouchableOpacity
                 style={styles.logoutButton}
-                onPress={handleLogout}>
+                onPress={handleLogoutPress}>
                 <Text style={styles.logoutButtonText}>Logout</Text>
               </TouchableOpacity>
             </View>
           </View>
         )}
       </ScrollView>
+
+      {/* Custom Logout Modal */}
+      <Modal
+        visible={logoutModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setLogoutModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.confirmModal}>
+            <Text style={styles.confirmTitle}>Confirm Logout</Text>
+            <Text style={styles.confirmText}>
+              Are you sure you want to logout?
+            </Text>
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity
+                style={[styles.confirmBtn, styles.cancelConfirmBtn]}
+                onPress={() => setLogoutModalVisible(false)}>
+                <Text style={styles.cancelConfirmText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.confirmBtn, styles.logoutConfirmBtn]}
+                onPress={confirmLogout}>
+                <Text style={styles.logoutConfirmText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Create/Edit Modal */}
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
@@ -1188,7 +1225,7 @@ const styles = StyleSheet.create({
   arrow: { fontSize: 18, color: "#666" },
 
   logoutButton: {
-    backgroundColor: "#FF4444",
+    backgroundColor: "#EF4444",
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
@@ -1203,7 +1240,8 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.95)",
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContent: {
     backgroundColor: "#131629",
@@ -1211,6 +1249,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     maxHeight: height * 0.9,
     padding: 20,
+    width: width,
+    alignSelf: "center",
   },
   modalHeader: {
     flexDirection: "row",
@@ -1297,4 +1337,52 @@ const styles = StyleSheet.create({
   detailText: { fontSize: 14, color: "#DDD", marginBottom: 4 },
   coverFull: { backgroundColor: "#1E2240", padding: 14, borderRadius: 12 },
   coverFullText: { fontSize: 14, color: "#CCC", fontStyle: "italic" },
+
+  // Custom Logout Modal Styles
+  confirmModal: {
+    backgroundColor: "#131629",
+    borderRadius: 20,
+    padding: 24,
+    width: width - 60,
+    alignSelf: "center",
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  confirmTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  confirmText: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  confirmButtons: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  confirmBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  cancelConfirmBtn: {
+    backgroundColor: "#1E2240",
+  },
+  logoutConfirmBtn: {
+    backgroundColor: "#EF4444",
+  },
+  cancelConfirmText: {
+    color: "#888",
+    fontWeight: "600",
+  },
+  logoutConfirmText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
 });
