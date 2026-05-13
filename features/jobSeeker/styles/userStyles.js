@@ -504,4 +504,452 @@ export const styles = StyleSheet.create({
     color: "#F59E0B",
     textAlign: "center",
   },
+  // Add to userStyles.js
+
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  halfInput: {
+    flex: 1,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#2A2E50",
+    marginVertical: 16,
+  },
+  warningBox: {
+    backgroundColor: "#FF444420",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  warningText: {
+    color: "#FF8888",
+    fontSize: 12,
+    textAlign: "center",
+  },
+  disabledBtn: {
+    opacity: 0.5,
+  },
+  progressContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 12,
+  },
+  progressDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#2A2E50",
+  },
+  progressDotActive: {
+    width: 24,
+    backgroundColor: "#7C3AED",
+  },
+  progressDotCompleted: {
+    backgroundColor: "#10B981",
+  },
+  stepTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 20,
+  },
+  subStepTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#7C3AED",
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    color: "#DDD",
+    marginBottom: 6,
+    fontWeight: "500",
+  },
+  required: {
+    color: "#EF4444",
+  },
+  input: {
+    backgroundColor: "#1E2240",
+    borderRadius: 12,
+    padding: 14,
+    color: "#fff",
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  textArea: {
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+  inputError: {
+    borderColor: "#EF4444",
+  },
+  errorText: {
+    color: "#EF4444",
+    fontSize: 11,
+    marginTop: 4,
+  },
+  pickerContainer: {
+    backgroundColor: "#1E2240",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+    overflow: "hidden",
+  },
+  picker: {
+    color: "#fff",
+    height: 50,
+  },
+  checkboxWrapper: {
+    marginBottom: 16,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#7C3AED",
+    marginRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: "#7C3AED",
+  },
+  checkboxInner: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  checkboxText: {
+    flex: 1,
+    fontSize: 13,
+    color: "#DDD",
+  },
+  linkText: {
+    color: "#7C3AED",
+    textDecorationLine: "underline",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#131629",
+    borderRadius: 24,
+    padding: 20,
+    maxHeight: "90%",
+    width: Platform.OS === "web" ? 500 : "100%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  modalClose: {
+    fontSize: 24,
+    color: "#888",
+    fontWeight: "bold",
+  },
+  modalFooter: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#1E2240",
+  },
+  prevBtn: {
+    flex: 1,
+    backgroundColor: "#1E2240",
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  prevBtnText: {
+    color: "#888",
+    fontWeight: "600",
+  },
+  nextBtn: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  nextBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  submitBtn: {
+    flex: 1,
+    backgroundColor: "#10B981",
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  submitBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  // Add to features/jobSeeker/styles/userStyles.js
+
+  // Stats Grid
+  statsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 16,
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+    alignItems: "center",
+  },
+  statNumber: {
+    fontSize: 28,
+    fontWeight: "bold",
+  },
+  statLabel: {
+    fontSize: 12,
+    color: "#888",
+    marginTop: 4,
+  },
+
+  // Application Card
+  appCard: {
+    backgroundColor: "#131629",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  appJobTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  appCompany: {
+    fontSize: 13,
+    color: "#888",
+    marginTop: 2,
+  },
+  appDate: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 4,
+  },
+  appStatusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+  appScore: {
+    fontSize: 12,
+    color: "#10B981",
+    fontWeight: "600",
+  },
+
+  // Detail Modal Styles
+  detailModalContainer: {
+    flex: 1,
+    backgroundColor: "#0B0D1A",
+  },
+  detailModalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === "ios" ? 56 : 20,
+    paddingBottom: 12,
+    backgroundColor: "#131629",
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  detailModalBackText: {
+    fontSize: 16,
+    color: "#7C3AED",
+  },
+  detailModalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  detailModalCloseText: {
+    fontSize: 20,
+    color: "#888",
+  },
+  detailModalScroll: {
+    flex: 1,
+    padding: 16,
+  },
+  detailJobHeader: {
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  detailJobTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 4,
+  },
+  detailJobCompany: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 12,
+  },
+  detailJobMeta: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 16,
+    marginBottom: 12,
+  },
+  detailJobMetaText: {
+    fontSize: 12,
+    color: "#DDD",
+  },
+  detailStatusBadge: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  detailStatusText: {
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  detailSection: {
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+    overflow: "hidden",
+  },
+  detailSectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#7C3AED",
+    padding: 16,
+    backgroundColor: "#1A1D35",
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  detailInfoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  detailInfoLabel: {
+    fontSize: 13,
+    color: "#888",
+    fontWeight: "500",
+    flex: 1,
+  },
+  detailInfoValue: {
+    fontSize: 13,
+    color: "#DDD",
+    flex: 2,
+    textAlign: "right",
+  },
+  detailSubTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#9B8EFF",
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 16,
+  },
+  detailSkillsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    padding: 16,
+    paddingTop: 0,
+  },
+  detailSkillChip: {
+    backgroundColor: "#1E2240",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  detailSkillText: {
+    fontSize: 11,
+    color: "#AAA",
+  },
+  detailCoverBox: {
+    backgroundColor: "#1E2240",
+    padding: 12,
+    margin: 16,
+    borderRadius: 10,
+  },
+  detailCoverText: {
+    fontSize: 13,
+    color: "#CCC",
+    lineHeight: 18,
+  },
+  emptyState: {
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    color: "#888",
+  },
+  emptyText: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 8,
+  },
 });

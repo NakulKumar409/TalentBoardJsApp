@@ -12,27 +12,9 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { styles } from "../styles/userStyles";
 
-// Only import DateTimePickerModal for mobile (not for web)
-let DateTimePickerModal = null;
-if (Platform.OS !== "web") {
-  DateTimePickerModal = require("react-native-modal-datetime-picker").default;
-}
-
-// Helper function to format date
-const formatDate = (date) => {
-  if (!date) return "";
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-// ========== DATE PICKER INPUT (Works on Web + Mobile) ==========
+// Simple Date Input that works on both Web & Mobile
 const DatePickerInput = ({ label, value, onSelect, error, required }) => {
-  const [isPickerVisible, setPickerVisible] = useState(false);
-
-  // FOR WEB
+  // FOR WEB - use native date input
   if (Platform.OS === "web") {
     return (
       <View style={styles.inputGroup}>
@@ -60,42 +42,22 @@ const DatePickerInput = ({ label, value, onSelect, error, required }) => {
     );
   }
 
-  // FOR MOBILE
-  const showPicker = () => setPickerVisible(true);
-  const hidePicker = () => setPickerVisible(false);
-
-  const handleConfirm = (selectedDate) => {
-    if (selectedDate) {
-      onSelect(formatDate(selectedDate));
-    }
-    hidePicker();
-  };
-
+  // FOR MOBILE - simple TextInput with placeholder
   return (
     <View style={styles.inputGroup}>
       <Text style={styles.label}>
         {label} {required && <Text style={styles.required}>*</Text>}
       </Text>
-      <TouchableOpacity
-        style={[styles.datePickerButton, error && styles.inputError]}
-        onPress={showPicker}
-        activeOpacity={0.7}>
-        <Text style={value ? styles.dateText : styles.placeholderText}>
-          {value || `Select ${label}`}
-        </Text>
-      </TouchableOpacity>
+      <TextInput
+        style={[styles.input, error && styles.inputError]}
+        placeholder={`YYYY-MM-DD (e.g., ${
+          new Date().getFullYear() - 25
+        }-01-01)`}
+        placeholderTextColor="#666"
+        value={value}
+        onChangeText={onSelect}
+      />
       {error && <Text style={styles.errorText}>{error}</Text>}
-
-      {DateTimePickerModal && (
-        <DateTimePickerModal
-          isVisible={isPickerVisible}
-          mode="date"
-          onConfirm={handleConfirm}
-          onCancel={hidePicker}
-          date={value ? new Date(value) : new Date(2000, 0, 1)}
-          maximumDate={new Date()}
-        />
-      )}
     </View>
   );
 };
@@ -208,63 +170,75 @@ const Step2 = ({ formData, setFormData, errors }) => (
       {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
     </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>
-        City <Text style={styles.required}>*</Text>
-      </Text>
-      <TextInput
-        style={[styles.input, errors.city && styles.inputError]}
-        placeholder="City"
-        placeholderTextColor="#666"
-        value={formData.city}
-        onChangeText={(t) => setFormData("city", t)}
-      />
-      {errors.city && <Text style={styles.errorText}>{errors.city}</Text>}
+    <View style={styles.row}>
+      <View style={[styles.halfInput, { marginRight: 8 }]}>
+        <Text style={styles.label}>
+          City <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={[styles.input, errors.city && styles.inputError]}
+          placeholder="City"
+          placeholderTextColor="#666"
+          value={formData.city}
+          onChangeText={(t) => setFormData("city", t)}
+        />
+        {errors.city && <Text style={styles.errorText}>{errors.city}</Text>}
+      </View>
+
+      <View style={[styles.halfInput, { marginLeft: 8 }]}>
+        <Text style={styles.label}>State</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="State"
+          placeholderTextColor="#666"
+          value={formData.state}
+          onChangeText={(t) => setFormData("state", t)}
+        />
+      </View>
     </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>State</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="State"
-        placeholderTextColor="#666"
-        value={formData.state}
-        onChangeText={(t) => setFormData("state", t)}
-      />
+    <View style={styles.row}>
+      <View style={[styles.halfInput, { marginRight: 8 }]}>
+        <Text style={styles.label}>
+          Country <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={[styles.input, errors.country && styles.inputError]}
+          placeholder="Country"
+          placeholderTextColor="#666"
+          value={formData.country}
+          onChangeText={(t) => setFormData("country", t)}
+        />
+        {errors.country && (
+          <Text style={styles.errorText}>{errors.country}</Text>
+        )}
+      </View>
+
+      <View style={[styles.halfInput, { marginLeft: 8 }]}>
+        <Text style={styles.label}>Pincode</Text>
+        <TextInput
+          style={[styles.input, errors.pincode && styles.inputError]}
+          placeholder="6-digit pincode"
+          placeholderTextColor="#666"
+          keyboardType="numeric"
+          maxLength={6}
+          value={formData.pincode}
+          onChangeText={(t) => setFormData("pincode", t)}
+        />
+        {errors.pincode && (
+          <Text style={styles.errorText}>{errors.pincode}</Text>
+        )}
+      </View>
     </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>
-        Country <Text style={styles.required}>*</Text>
-      </Text>
-      <TextInput
-        style={[styles.input, errors.country && styles.inputError]}
-        placeholder="Country"
-        placeholderTextColor="#666"
-        value={formData.country}
-        onChangeText={(t) => setFormData("country", t)}
-      />
-      {errors.country && <Text style={styles.errorText}>{errors.country}</Text>}
-    </View>
+    <View style={styles.divider} />
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Pincode</Text>
-      <TextInput
-        style={[styles.input, errors.pincode && styles.inputError]}
-        placeholder="6-digit pincode"
-        placeholderTextColor="#666"
-        keyboardType="numeric"
-        maxLength={6}
-        value={formData.pincode}
-        onChangeText={(t) => setFormData("pincode", t)}
-      />
-      {errors.pincode && <Text style={styles.errorText}>{errors.pincode}</Text>}
-    </View>
+    <Text style={styles.subStepTitle}>🪪 Government IDs (Optional)</Text>
 
     <View style={styles.inputGroup}>
       <Text style={styles.label}>Aadhaar Number</Text>
       <TextInput
-        style={[styles.input, errors.aadhaar && styles.inputError]}
+        style={styles.input}
         placeholder="12-digit Aadhaar number"
         placeholderTextColor="#666"
         keyboardType="numeric"
@@ -272,20 +246,18 @@ const Step2 = ({ formData, setFormData, errors }) => (
         value={formData.aadhaar}
         onChangeText={(t) => setFormData("aadhaar", t)}
       />
-      {errors.aadhaar && <Text style={styles.errorText}>{errors.aadhaar}</Text>}
     </View>
 
     <View style={styles.inputGroup}>
       <Text style={styles.label}>PAN Number</Text>
       <TextInput
-        style={[styles.input, errors.pan && styles.inputError]}
+        style={styles.input}
         placeholder="PAN card number"
         placeholderTextColor="#666"
         autoCapitalize="characters"
         value={formData.pan}
         onChangeText={(t) => setFormData("pan", t)}
       />
-      {errors.pan && <Text style={styles.errorText}>{errors.pan}</Text>}
     </View>
 
     <View style={styles.inputGroup}>
@@ -307,38 +279,40 @@ const Step3 = ({ formData, setFormData, errors }) => (
   <>
     <Text style={styles.stepTitle}>🎓 Step 3/5: Education Details</Text>
 
-    <Text style={styles.subStepTitle}>10th / SSC</Text>
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>
-        Board <Text style={styles.required}>*</Text>
-      </Text>
-      <TextInput
-        style={[styles.input, errors.tenthBoard && styles.inputError]}
-        placeholder="Board name"
-        placeholderTextColor="#666"
-        value={formData.tenthBoard}
-        onChangeText={(t) => setFormData("tenthBoard", t)}
-      />
-      {errors.tenthBoard && (
-        <Text style={styles.errorText}>{errors.tenthBoard}</Text>
-      )}
-    </View>
+    <Text style={styles.subStepTitle}>📚 10th / SSC</Text>
+    <View style={styles.row}>
+      <View style={[styles.halfInput, { marginRight: 8 }]}>
+        <Text style={styles.label}>
+          Board <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={[styles.input, errors.tenthBoard && styles.inputError]}
+          placeholder="Board name"
+          placeholderTextColor="#666"
+          value={formData.tenthBoard}
+          onChangeText={(t) => setFormData("tenthBoard", t)}
+        />
+        {errors.tenthBoard && (
+          <Text style={styles.errorText}>{errors.tenthBoard}</Text>
+        )}
+      </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>
-        Percentage <Text style={styles.required}>*</Text>
-      </Text>
-      <TextInput
-        style={[styles.input, errors.tenthPercentage && styles.inputError]}
-        placeholder="Percentage (0-100)"
-        placeholderTextColor="#666"
-        keyboardType="numeric"
-        value={formData.tenthPercentage}
-        onChangeText={(t) => setFormData("tenthPercentage", t)}
-      />
-      {errors.tenthPercentage && (
-        <Text style={styles.errorText}>{errors.tenthPercentage}</Text>
-      )}
+      <View style={[styles.halfInput, { marginLeft: 8 }]}>
+        <Text style={styles.label}>
+          Percentage <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={[styles.input, errors.tenthPercentage && styles.inputError]}
+          placeholder="% (0-100)"
+          placeholderTextColor="#666"
+          keyboardType="numeric"
+          value={formData.tenthPercentage}
+          onChangeText={(t) => setFormData("tenthPercentage", t)}
+        />
+        {errors.tenthPercentage && (
+          <Text style={styles.errorText}>{errors.tenthPercentage}</Text>
+        )}
+      </View>
     </View>
 
     <View style={styles.inputGroup}>
@@ -358,28 +332,30 @@ const Step3 = ({ formData, setFormData, errors }) => (
       )}
     </View>
 
-    <Text style={styles.subStepTitle}>12th / HSC</Text>
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Board</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Board name"
-        placeholderTextColor="#666"
-        value={formData.twelfthBoard}
-        onChangeText={(t) => setFormData("twelfthBoard", t)}
-      />
-    </View>
+    <Text style={styles.subStepTitle}>📚 12th / HSC</Text>
+    <View style={styles.row}>
+      <View style={[styles.halfInput, { marginRight: 8 }]}>
+        <Text style={styles.label}>Board</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Board name"
+          placeholderTextColor="#666"
+          value={formData.twelfthBoard}
+          onChangeText={(t) => setFormData("twelfthBoard", t)}
+        />
+      </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Percentage</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Percentage (0-100)"
-        placeholderTextColor="#666"
-        keyboardType="numeric"
-        value={formData.twelfthPercentage}
-        onChangeText={(t) => setFormData("twelfthPercentage", t)}
-      />
+      <View style={[styles.halfInput, { marginLeft: 8 }]}>
+        <Text style={styles.label}>Percentage</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="% (0-100)"
+          placeholderTextColor="#666"
+          keyboardType="numeric"
+          value={formData.twelfthPercentage}
+          onChangeText={(t) => setFormData("twelfthPercentage", t)}
+        />
+      </View>
     </View>
 
     <View style={styles.inputGroup}>
@@ -394,7 +370,7 @@ const Step3 = ({ formData, setFormData, errors }) => (
       />
     </View>
 
-    <Text style={styles.subStepTitle}>Graduation</Text>
+    <Text style={styles.subStepTitle}>🎓 Graduation</Text>
     <View style={styles.inputGroup}>
       <Text style={styles.label}>College Name</Text>
       <TextInput
@@ -406,27 +382,29 @@ const Step3 = ({ formData, setFormData, errors }) => (
       />
     </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Degree</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Degree (e.g., B.Tech, B.Sc)"
-        placeholderTextColor="#666"
-        value={formData.graduationDegree}
-        onChangeText={(t) => setFormData("graduationDegree", t)}
-      />
-    </View>
+    <View style={styles.row}>
+      <View style={[styles.halfInput, { marginRight: 8 }]}>
+        <Text style={styles.label}>Degree</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Degree (e.g., B.Tech)"
+          placeholderTextColor="#666"
+          value={formData.graduationDegree}
+          onChangeText={(t) => setFormData("graduationDegree", t)}
+        />
+      </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Percentage/CGPA</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Percentage or CGPA"
-        placeholderTextColor="#666"
-        keyboardType="numeric"
-        value={formData.graduationPercentage}
-        onChangeText={(t) => setFormData("graduationPercentage", t)}
-      />
+      <View style={[styles.halfInput, { marginLeft: 8 }]}>
+        <Text style={styles.label}>Percentage/CGPA</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="% or CGPA"
+          placeholderTextColor="#666"
+          keyboardType="numeric"
+          value={formData.graduationPercentage}
+          onChangeText={(t) => setFormData("graduationPercentage", t)}
+        />
+      </View>
     </View>
 
     <View style={styles.inputGroup}>
@@ -441,7 +419,7 @@ const Step3 = ({ formData, setFormData, errors }) => (
       />
     </View>
 
-    <Text style={styles.subStepTitle}>Post Graduation (Optional)</Text>
+    <Text style={styles.subStepTitle}>🎓 Post Graduation (Optional)</Text>
     <View style={styles.inputGroup}>
       <Text style={styles.label}>College Name</Text>
       <TextInput
@@ -453,27 +431,29 @@ const Step3 = ({ formData, setFormData, errors }) => (
       />
     </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Degree</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Degree (e.g., M.Tech, MBA)"
-        placeholderTextColor="#666"
-        value={formData.postGraduationDegree}
-        onChangeText={(t) => setFormData("postGraduationDegree", t)}
-      />
-    </View>
+    <View style={styles.row}>
+      <View style={[styles.halfInput, { marginRight: 8 }]}>
+        <Text style={styles.label}>Degree</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Degree (e.g., M.Tech)"
+          placeholderTextColor="#666"
+          value={formData.postGraduationDegree}
+          onChangeText={(t) => setFormData("postGraduationDegree", t)}
+        />
+      </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Percentage/CGPA</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Percentage or CGPA"
-        placeholderTextColor="#666"
-        keyboardType="numeric"
-        value={formData.postGraduationPercentage}
-        onChangeText={(t) => setFormData("postGraduationPercentage", t)}
-      />
+      <View style={[styles.halfInput, { marginLeft: 8 }]}>
+        <Text style={styles.label}>Percentage/CGPA</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="% or CGPA"
+          placeholderTextColor="#666"
+          keyboardType="numeric"
+          value={formData.postGraduationPercentage}
+          onChangeText={(t) => setFormData("postGraduationPercentage", t)}
+        />
+      </View>
     </View>
 
     <View style={styles.inputGroup}>
@@ -499,7 +479,7 @@ const Step4 = ({ formData, setFormData, errors }) => (
       <Text style={styles.label}>Total Experience (Years)</Text>
       <TextInput
         style={styles.input}
-        placeholder="Years of experience"
+        placeholder="Years of experience (0 for fresher)"
         placeholderTextColor="#666"
         keyboardType="numeric"
         value={formData.experienceYears}
@@ -507,69 +487,79 @@ const Step4 = ({ formData, setFormData, errors }) => (
       />
     </View>
 
-    <Text style={styles.subStepTitle}>Current Employment</Text>
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Company Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Current company name"
-        placeholderTextColor="#666"
-        value={formData.companyName}
-        onChangeText={(t) => setFormData("companyName", t)}
-      />
+    <Text style={styles.subStepTitle}>🏢 Current/Last Employment</Text>
+    <View style={styles.row}>
+      <View style={[styles.halfInput, { marginRight: 8 }]}>
+        <Text style={styles.label}>Company Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Company name"
+          placeholderTextColor="#666"
+          value={formData.companyName}
+          onChangeText={(t) => setFormData("companyName", t)}
+        />
+      </View>
+
+      <View style={[styles.halfInput, { marginLeft: 8 }]}>
+        <Text style={styles.label}>Role</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Your role"
+          placeholderTextColor="#666"
+          value={formData.companyRole}
+          onChangeText={(t) => setFormData("companyRole", t)}
+        />
+      </View>
     </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Role / Designation</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Your role"
-        placeholderTextColor="#666"
-        value={formData.companyRole}
-        onChangeText={(t) => setFormData("companyRole", t)}
-      />
+    <View style={styles.row}>
+      <View style={[styles.halfInput, { marginRight: 8 }]}>
+        <DatePickerInput
+          label="Start Date"
+          value={formData.startDate}
+          onSelect={(date) => setFormData("startDate", date)}
+          error={null}
+          required={false}
+        />
+      </View>
+
+      <View style={[styles.halfInput, { marginLeft: 8 }]}>
+        <DatePickerInput
+          label="End Date"
+          value={formData.endDate}
+          onSelect={(date) => setFormData("endDate", date)}
+          error={null}
+          required={false}
+        />
+      </View>
     </View>
 
-    <DatePickerInput
-      label="Start Date"
-      value={formData.startDate}
-      onSelect={(date) => setFormData("startDate", date)}
-      error={null}
-      required={false}
-    />
+    <Text style={styles.subStepTitle}>📋 Previous Employment</Text>
+    <View style={styles.row}>
+      <View style={[styles.halfInput, { marginRight: 8 }]}>
+        <Text style={styles.label}>Previous Company</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Previous company"
+          placeholderTextColor="#666"
+          value={formData.previousCompany}
+          onChangeText={(t) => setFormData("previousCompany", t)}
+        />
+      </View>
 
-    <DatePickerInput
-      label="End Date"
-      value={formData.endDate}
-      onSelect={(date) => setFormData("endDate", date)}
-      error={null}
-      required={false}
-    />
-
-    <Text style={styles.subStepTitle}>Previous Employment</Text>
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Previous Company</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Previous company name"
-        placeholderTextColor="#666"
-        value={formData.previousCompany}
-        onChangeText={(t) => setFormData("previousCompany", t)}
-      />
+      <View style={[styles.halfInput, { marginLeft: 8 }]}>
+        <Text style={styles.label}>Previous Role</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Previous role"
+          placeholderTextColor="#666"
+          value={formData.previousRole}
+          onChangeText={(t) => setFormData("previousRole", t)}
+        />
+      </View>
     </View>
 
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Previous Role</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Previous role"
-        placeholderTextColor="#666"
-        value={formData.previousRole}
-        onChangeText={(t) => setFormData("previousRole", t)}
-      />
-    </View>
-
-    <Text style={styles.subStepTitle}>Skills</Text>
+    <Text style={styles.subStepTitle}>⚡ Skills</Text>
     <View style={styles.inputGroup}>
       <Text style={styles.label}>
         Skills <Text style={styles.required}>*</Text>
@@ -601,7 +591,7 @@ const Step4 = ({ formData, setFormData, errors }) => (
       />
     </View>
 
-    <Text style={styles.subStepTitle}>Social & Portfolio</Text>
+    <Text style={styles.subStepTitle}>🔗 Social & Portfolio</Text>
     <View style={styles.inputGroup}>
       <Text style={styles.label}>GitHub Profile</Text>
       <TextInput
@@ -655,7 +645,7 @@ const Step5 = ({ formData, setFormData, errors }) => {
           placeholder="Why should we hire you? Tell us about yourself..."
           placeholderTextColor="#666"
           multiline
-          numberOfLines={5}
+          numberOfLines={6}
           value={formData.coverLetter}
           onChangeText={(text) => setFormData("coverLetter", text)}
         />
@@ -787,7 +777,11 @@ export const ApplicationFormModal = ({
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { maxHeight: "90%" }]}>
+        <View
+          style={[
+            styles.modalContent,
+            { maxHeight: "90%", width: Platform.OS === "web" ? 500 : "100%" },
+          ]}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Apply for {job?.title}</Text>
             <TouchableOpacity onPress={onClose}>
