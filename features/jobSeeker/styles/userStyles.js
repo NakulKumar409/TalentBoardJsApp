@@ -504,4 +504,218 @@ export const styles = StyleSheet.create({
     color: "#F59E0B",
     textAlign: "center",
   },
+  // Add to userStyles.js
+
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  halfInput: {
+    flex: 1,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#2A2E50",
+    marginVertical: 16,
+  },
+  warningBox: {
+    backgroundColor: "#FF444420",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  warningText: {
+    color: "#FF8888",
+    fontSize: 12,
+    textAlign: "center",
+  },
+  disabledBtn: {
+    opacity: 0.5,
+  },
+  progressContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 12,
+  },
+  progressDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#2A2E50",
+  },
+  progressDotActive: {
+    width: 24,
+    backgroundColor: "#7C3AED",
+  },
+  progressDotCompleted: {
+    backgroundColor: "#10B981",
+  },
+  stepTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 20,
+  },
+  subStepTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#7C3AED",
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    color: "#DDD",
+    marginBottom: 6,
+    fontWeight: "500",
+  },
+  required: {
+    color: "#EF4444",
+  },
+  input: {
+    backgroundColor: "#1E2240",
+    borderRadius: 12,
+    padding: 14,
+    color: "#fff",
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  textArea: {
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+  inputError: {
+    borderColor: "#EF4444",
+  },
+  errorText: {
+    color: "#EF4444",
+    fontSize: 11,
+    marginTop: 4,
+  },
+  pickerContainer: {
+    backgroundColor: "#1E2240",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+    overflow: "hidden",
+  },
+  picker: {
+    color: "#fff",
+    height: 50,
+  },
+  checkboxWrapper: {
+    marginBottom: 16,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#7C3AED",
+    marginRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: "#7C3AED",
+  },
+  checkboxInner: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  checkboxText: {
+    flex: 1,
+    fontSize: 13,
+    color: "#DDD",
+  },
+  linkText: {
+    color: "#7C3AED",
+    textDecorationLine: "underline",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#131629",
+    borderRadius: 24,
+    padding: 20,
+    maxHeight: "90%",
+    width: Platform.OS === "web" ? 500 : "100%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  modalClose: {
+    fontSize: 24,
+    color: "#888",
+    fontWeight: "bold",
+  },
+  modalFooter: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#1E2240",
+  },
+  prevBtn: {
+    flex: 1,
+    backgroundColor: "#1E2240",
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  prevBtnText: {
+    color: "#888",
+    fontWeight: "600",
+  },
+  nextBtn: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  nextBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  submitBtn: {
+    flex: 1,
+    backgroundColor: "#10B981",
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  submitBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
 });

@@ -1,9 +1,9 @@
 // features/employerJobs/styles/employerStyles.js
-import { StyleSheet, Dimensions, Platform } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 const { width, height } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
-  // ... YOUR EXACT ORIGINAL STYLES HERE (same as your 1600 line file)
+  // ... YOUR EXACT ORIGINAL STYLES
   container: { flex: 1, backgroundColor: "#0B0D1A" },
   loadingContainer: {
     flex: 1,
@@ -364,4 +364,422 @@ export const styles = StyleSheet.create({
   logoutConfirmBtn: { backgroundColor: "#EF4444" },
   cancelConfirmText: { color: "#888", fontWeight: "600" },
   logoutConfirmText: { color: "#fff", fontWeight: "600" },
+
+  // ========== NEW STYLES FOR FULL DETAILS MODAL ==========
+
+  // Modal Container
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#0B0D1A",
+  },
+
+  // Full Detail Header
+  fullDetailHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: Platform.OS === "ios" ? 56 : 20,
+    backgroundColor: "#131629",
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  fullDetailBackBtn: {
+    padding: 8,
+  },
+  fullDetailCloseBtn: {
+    padding: 8,
+  },
+  fullDetailTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#fff",
+  },
+  fullDetailScroll: {
+    flex: 1,
+    padding: 16,
+  },
+
+  // Profile Header
+  fullProfileHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  fullProfileAvatar: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "#7C3AED",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  fullProfileAvatarText: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  fullProfileInfo: {
+    flex: 1,
+  },
+  fullProfileName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 4,
+  },
+  fullProfileEmail: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 8,
+  },
+  fullProfileStatus: {
+    flexDirection: "row",
+  },
+
+  // Status Badge Small
+  statusBadgeSmall: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusTextSmall: {
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+
+  // Sections
+  fullSection: {
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  fullSectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 12,
+  },
+  fullSubTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#7C3AED",
+    marginTop: 12,
+    marginBottom: 8,
+  },
+
+  // Info Grid
+  fullInfoGrid: {
+    gap: 12,
+  },
+  fullInfoItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+
+  fullInfoLabel: {
+    fontSize: 13,
+    color: "#888",
+    fontWeight: "500",
+    flex: 1,
+  },
+  // Add these styles at the end of your employerStyles.js
+
+  fullDetailScrollContent: {
+    paddingBottom: 20,
+  },
+  sectionHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    gap: 6,
+  },
+  fullInfoItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  fullInfoLabel: {
+    fontSize: 13,
+    color: "#888",
+    fontWeight: "500",
+    flex: 1,
+  },
+  fullInfoValue: {
+    fontSize: 13,
+    color: "#DDD",
+    flex: 1.5,
+    textAlign: "right",
+  },
+  fullInfoLink: {
+    fontSize: 12,
+    color: "#7C3AED",
+    flex: 1.5,
+    textAlign: "right",
+    textDecorationLine: "underline",
+  },
+  fullInfoScore: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#10B981",
+    textAlign: "right",
+  },
+  scoreContainer: {
+    flex: 1.5,
+  },
+  scoreBar: {
+    height: 4,
+    backgroundColor: "#1E2240",
+    borderRadius: 2,
+    marginTop: 6,
+    overflow: "hidden",
+  },
+  scoreFill: {
+    height: "100%",
+    backgroundColor: "#10B981",
+    borderRadius: 2,
+  },
+  fullSkillsWrapper: {
+    marginBottom: 12,
+  },
+  fullSkillsLabel: {
+    fontSize: 12,
+    color: "#888",
+    marginBottom: 8,
+  },
+  fullSkillsList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  fullSkillChip: {
+    backgroundColor: "#1E2240",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  fullSkillChipTop: {
+    backgroundColor: "#7C3AED20",
+    borderWidth: 1,
+    borderColor: "#7C3AED",
+  },
+  fullSkillChipText: {
+    fontSize: 11,
+    color: "#AAA",
+  },
+  fullSkillChipTopText: {
+    color: "#7C3AED",
+    fontWeight: "500",
+  },
+  fullCoverBox: {
+    backgroundColor: "#1E2240",
+    padding: 12,
+    borderRadius: 10,
+  },
+  fullCoverText: {
+    fontSize: 13,
+    color: "#CCC",
+    lineHeight: 18,
+  },
+  fullStatusButtons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  fullStatusBtn: {
+    flex: 1,
+    minWidth: (width - 60) / 2,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  fullStatusBtnActive: {
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
+  fullStatusBtnText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#fff",
+  },
+  fullSubTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#7C3AED",
+    marginTop: 10,
+    marginBottom: 8,
+  },
+  statusBadgeSmall: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  statusTextSmall: {
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  fullInfoValue: {
+    fontSize: 13,
+    color: "#DDD",
+    flex: 2,
+    textAlign: "right",
+  },
+  fullInfoLink: {
+    fontSize: 13,
+    color: "#7C3AED",
+    flex: 2,
+    textAlign: "right",
+    textDecorationLine: "underline",
+  },
+  fullInfoScore: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#4CAF50",
+    flex: 2,
+    textAlign: "right",
+  },
+  fullInfoSuccess: {
+    color: "#4CAF50",
+    fontWeight: "600",
+  },
+
+  // Score Bar
+  scoreContainer: {
+    flex: 2,
+    marginLeft: 12,
+  },
+  scoreBar: {
+    height: 6,
+    backgroundColor: "#1E2240",
+    borderRadius: 3,
+    marginTop: 8,
+    overflow: "hidden",
+  },
+  scoreFill: {
+    height: "100%",
+    backgroundColor: "#4CAF50",
+    borderRadius: 3,
+  },
+
+  // Skills
+  fullSkillsContainer: {
+    gap: 16,
+  },
+  fullSkillsWrapper: {
+    gap: 8,
+  },
+  fullSkillsLabel: {
+    fontSize: 13,
+    color: "#888",
+    fontWeight: "500",
+  },
+  fullSkillsList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  fullSkillChip: {
+    backgroundColor: "#1E2240",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  fullSkillChipTop: {
+    backgroundColor: "#7C3AED20",
+    borderColor: "#7C3AED",
+  },
+  fullSkillChipText: {
+    fontSize: 12,
+    color: "#AAA",
+  },
+  fullSkillChipTopText: {
+    color: "#7C3AED",
+    fontWeight: "500",
+  },
+
+  // Cover Letter
+  fullCoverBox: {
+    backgroundColor: "#1E2240",
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#2A2E50",
+  },
+  fullCoverText: {
+    fontSize: 14,
+    color: "#CCC",
+    fontStyle: "italic",
+    lineHeight: 20,
+  },
+
+  // Status Buttons
+  fullStatusButtons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 8,
+  },
+  fullStatusBtn: {
+    flex: 1,
+    minWidth: (width - 72) / 3,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+    opacity: 0.9,
+  },
+  fullStatusBtnActive: {
+    opacity: 1,
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
+  fullStatusBtnText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#fff",
+  },
+
+  // Footer
+  fullFooter: {
+    height: 40,
+  },
 });
