@@ -718,4 +718,238 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
   },
+  // Add to features/jobSeeker/styles/userStyles.js
+
+  // Stats Grid
+  statsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 16,
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+    alignItems: "center",
+  },
+  statNumber: {
+    fontSize: 28,
+    fontWeight: "bold",
+  },
+  statLabel: {
+    fontSize: 12,
+    color: "#888",
+    marginTop: 4,
+  },
+
+  // Application Card
+  appCard: {
+    backgroundColor: "#131629",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  appJobTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  appCompany: {
+    fontSize: 13,
+    color: "#888",
+    marginTop: 2,
+  },
+  appDate: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 4,
+  },
+  appStatusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+  appScore: {
+    fontSize: 12,
+    color: "#10B981",
+    fontWeight: "600",
+  },
+
+  // Detail Modal Styles
+  detailModalContainer: {
+    flex: 1,
+    backgroundColor: "#0B0D1A",
+  },
+  detailModalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === "ios" ? 56 : 20,
+    paddingBottom: 12,
+    backgroundColor: "#131629",
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  detailModalBackText: {
+    fontSize: 16,
+    color: "#7C3AED",
+  },
+  detailModalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  detailModalCloseText: {
+    fontSize: 20,
+    color: "#888",
+  },
+  detailModalScroll: {
+    flex: 1,
+    padding: 16,
+  },
+  detailJobHeader: {
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+  },
+  detailJobTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 4,
+  },
+  detailJobCompany: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 12,
+  },
+  detailJobMeta: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 16,
+    marginBottom: 12,
+  },
+  detailJobMetaText: {
+    fontSize: 12,
+    color: "#DDD",
+  },
+  detailStatusBadge: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  detailStatusText: {
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  detailSection: {
+    backgroundColor: "#131629",
+    borderRadius: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#1E2240",
+    overflow: "hidden",
+  },
+  detailSectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#7C3AED",
+    padding: 16,
+    backgroundColor: "#1A1D35",
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  detailInfoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1E2240",
+  },
+  detailInfoLabel: {
+    fontSize: 13,
+    color: "#888",
+    fontWeight: "500",
+    flex: 1,
+  },
+  detailInfoValue: {
+    fontSize: 13,
+    color: "#DDD",
+    flex: 2,
+    textAlign: "right",
+  },
+  detailSubTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#9B8EFF",
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 16,
+  },
+  detailSkillsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    padding: 16,
+    paddingTop: 0,
+  },
+  detailSkillChip: {
+    backgroundColor: "#1E2240",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  detailSkillText: {
+    fontSize: 11,
+    color: "#AAA",
+  },
+  detailCoverBox: {
+    backgroundColor: "#1E2240",
+    padding: 12,
+    margin: 16,
+    borderRadius: 10,
+  },
+  detailCoverText: {
+    fontSize: 13,
+    color: "#CCC",
+    lineHeight: 18,
+  },
+  emptyState: {
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    color: "#888",
+  },
+  emptyText: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 8,
+  },
 });

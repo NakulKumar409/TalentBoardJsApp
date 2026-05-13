@@ -5,10 +5,10 @@ import { styles } from "../styles/userStyles";
 
 export const StatsGrid = ({ stats }) => {
   const items = [
-    { label: "Total", value: stats.totalApplications, color: "#3B82F6" },
-    { label: "Pending", value: stats.pending, color: "#F59E0B" },
-    { label: "Shortlisted", value: stats.shortlisted, color: "#10B981" },
-    { label: "Hired", value: stats.hired, color: "#8B5CF6" },
+    { label: "Total", value: stats?.totalApplications || 0, color: "#3B82F6" },
+    { label: "Pending", value: stats?.pending || 0, color: "#F59E0B" },
+    { label: "Shortlisted", value: stats?.shortlisted || 0, color: "#10B981" },
+    { label: "Hired", value: stats?.hired || 0, color: "#8B5CF6" },
   ];
 
   return (
