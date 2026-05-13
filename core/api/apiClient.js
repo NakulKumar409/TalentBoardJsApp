@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BASE_URL = "http://192.168.31.114:3004/api";
+const BASE_URL = "https://talentboard-x-api-with-mongo-db.onrender.com/api";
 
 const apiClient = {
   getToken: async () => {
